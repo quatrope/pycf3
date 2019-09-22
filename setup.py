@@ -3,14 +3,14 @@
 
 # Copyright (c) 2019, Juan B Cabral
 # License: BSD-3-Clause
-#   Full Text: https://github.com/quatrope/cf3/blob/master/LICENSE
+#   Full Text: https://github.com/quatrope/pycf3/blob/master/LICENSE
 
 
 # =============================================================================
 # DOCS
 # =============================================================================
 
-"""This file is for distribute cf3
+"""This file is for distribute pycf3
 
 """
 
@@ -29,7 +29,7 @@ from setuptools import setup # noqa
 # CONSTANTS
 # =============================================================================
 
-REQUIREMENTS = ["numpy", "requests"]
+REQUIREMENTS = ["numpy", "requests", "attrs"]
 
 with open("README.md") as fp:
     LONG_DESCRIPTION = fp.read()
@@ -43,13 +43,13 @@ DESCRIPTION = LONG_DESCRIPTION.splitlines()[2]
 
 def do_setup():
     setup(
-        name="cf3",
+        name="pycf3",
         version="2019.9",
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         author="QuatroPe",
         author_email="jbc.develop@gmail.com",
-        url="https://github.com/quatrope/cf3",
+        url="https://github.com/quatrope/pycf3",
         license="3 Clause BSD",
         keywords=[
             "astronomy", "cosmicflow", "Distance", "Velocity", "calculator"],
@@ -63,7 +63,7 @@ def do_setup():
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: Implementation :: CPython",
             "Topic :: Scientific/Engineering"),
-        py_modules=["cf3", "ez_setup"],
+        py_modules=["pycf3", "ez_setup"],
         install_requires=REQUIREMENTS)
 
 

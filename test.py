@@ -3,7 +3,7 @@
 
 # Copyright (c) 2019, Juan B Cabral
 # License: BSD-3-Clause
-#   Full Text: https://github.com/quatrope/cf3/blob/master/LICENSE
+#   Full Text: https://github.com/quatrope/pycf3/blob/master/LICENSE
 
 
 # =============================================================================
@@ -20,4 +20,14 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 # IMPORTS
 # =============================================================================
 
-import cf3
+import pycf3
+
+
+# =============================================================================
+# TESTCASES
+# =============================================================================
+
+class TestCaseEquatorial:
+
+    def test_default(self):
+        pass

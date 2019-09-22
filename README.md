@@ -1,4 +1,4 @@
-# cf3 - Cosmicflows-3 Distance-Velocity Calculator
+# pycf3 - Cosmicflows-3 Distance-Velocity Calculator client for Python
 
 Python client for Cosmicflows-3 Distance-Velocity Calculator at distances less
 than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
