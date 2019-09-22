@@ -25,8 +25,6 @@ Warning this code is SLOW!
 
 from numpy import testing as npt
 
-import pytest
-
 import pycf3
 
 

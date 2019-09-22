@@ -77,7 +77,7 @@ class SearchAt:
 
 
 @attr.s(cmp=False, hash=False, frozen=True)
-class _Response:
+class Response:
     coordinate = attr.ib()
     alpha = attr.ib()
     delta = attr.ib()
@@ -183,7 +183,7 @@ class CF3:
         rresponse = self.session.post(self.url, payload)
         parsed_rresponse = pq.PyQuery(rresponse.text)
 
-        response = _Response(
+        response = Response(
             coordinate=coordinate_system, alpha=alpha, delta=delta, cone=cone,
             distance=distance, velocity=velocity,
             response_=rresponse, d_=parsed_rresponse)
