@@ -107,7 +107,6 @@ class _Response:
 
         return SearchAt(ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb)
 
-
     @Vls_Observed_.default
     def _Vls_Observed__default(self):
         if self.distance is None:

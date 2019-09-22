@@ -266,7 +266,6 @@ class TestCaseSuperGalactic:
         npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
         npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
 
-
     def test_distance_10(self):
         with open("mock_data/tcSuperGalactic_distance_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
