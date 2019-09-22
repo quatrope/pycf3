@@ -34,7 +34,9 @@ REQUIREMENTS = ["numpy", "requests", "attrs", "bokeh", "pyquery"]
 with open("README.md") as fp:
     LONG_DESCRIPTION = fp.read()
 
-DESCRIPTION = LONG_DESCRIPTION.splitlines()[2]
+DESCRIPTION = " ".join(
+    [l for l in LONG_DESCRIPTION.splitlines()
+     if l.strip() and not l.startswith("[")][1:3])
 
 
 # =============================================================================
@@ -47,6 +49,7 @@ def do_setup():
         version="2019.9",
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
+        long_description_content_type='text/markdown',
         author="QuatroPe",
         author_email="jbc.develop@gmail.com",
         url="https://github.com/quatrope/pycf3",
