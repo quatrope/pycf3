@@ -130,9 +130,22 @@ class Response:
 
 @attr.s(cmp=False, hash=False, frozen=True)
 class CF3:
+    """Client to access the *Cosmicflows-3 Distance-Velocity Calculator*
+    *at distances* (http://edd.ifa.hawaii.edu/CF3calculator/)
 
-    url = attr.ib(default=URL, repr=True)
-    session = attr.ib(factory=requests.Session, repr=False)
+    Parameters
+    ----------
+
+    url : str (default: ``pycf3.URL``)
+        The endpoint of the cosmic flow calculator.
+    session : ``request.Session`` (default: ``None``)
+        The session to use to send the requests. By default a session without
+        any configuration is created. More info: https://2.python-requests.org
+
+    """
+
+    url: str = attr.ib(default=URL, repr=True)
+    session: requests.Session = attr.ib(factory=requests.Session, repr=False)
 
     def _search(self, coordinate_system, alpha, delta, cone,
                 distance=None, velocity=None):
