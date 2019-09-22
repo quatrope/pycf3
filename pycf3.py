@@ -39,23 +39,23 @@ import requests
 # CONSTANTS
 # =============================================================================
 
-class Coordinate(Enum):
+class CoordinateSystem(Enum):
     equatorial = "equatorial"
     galactic = "galactic"
     supergalactic = "supergalactic"
 
 
 ALPHA = {
-    Coordinate.equatorial: "ra",
-    Coordinate.galactic: "glon",
-    Coordinate.supergalactic: "sgl"
+    CoordinateSystem.equatorial: "ra",
+    CoordinateSystem.galactic: "glon",
+    CoordinateSystem.supergalactic: "sgl"
 }
 
 
 DELTA = {
-    Coordinate.equatorial: "dec",
-    Coordinate.galactic: "glat",
-    Coordinate.supergalactic: "sgb"
+    CoordinateSystem.equatorial: "dec",
+    CoordinateSystem.galactic: "glat",
+    CoordinateSystem.supergalactic: "sgb"
 }
 
 
@@ -65,6 +65,16 @@ URL = "http://edd.ifa.hawaii.edu/CF3calculator/getData.php"
 # =============================================================================
 # RESPONSE OBJECT
 # =============================================================================
+
+@attr.s(frozen=True)
+class SearchAt:
+    ra = attr.ib()
+    dec = attr.ib()
+    glon = attr.ib()
+    glat = attr.ib()
+    sgl = attr.ib()
+    sgb = attr.ib()
+
 
 @attr.s(cmp=False, hash=False, frozen=True)
 class _Response:
@@ -76,14 +86,27 @@ class _Response:
     velocity = attr.ib()
 
     response_ = attr.ib(repr=False)
-    d_ = attr.ib(repr=False, init=False)
+    d_ = attr.ib(repr=False)
 
+    search_at_ = attr.ib(init=False)
     Vls_Observed_ = attr.ib(repr=False, init=False)
     Vcls_Adjusted_ = attr.ib(repr=False, init=False)
 
-    @d_.default
-    def _d__default(self):
-        return pq.PyQuery(self.response_.text)
+    @search_at_.default
+    def _search_at__default(self):
+        coords_table = self.d_("table:last")
+
+        eq_coords = coords_table.find("td:contains('RA:')").parent()
+        ra, dec = (float(e.text) for e in eq_coords.find("td")[1::2])
+
+        gal_coords = coords_table.find("td:contains('Glon:')").parent()
+        glon, glat = (float(e.text) for e in gal_coords.find("td")[1::2])
+
+        sg_coords = coords_table.find("td:contains('SGL:')").parent()
+        sgl, sgb = (float(e.text) for e in sg_coords.find("td")[1::2])
+
+        return SearchAt(ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb)
+
 
     @Vls_Observed_.default
     def _Vls_Observed__default(self):
@@ -112,22 +135,23 @@ class CF3:
     url = attr.ib(default=URL, repr=True)
     session = attr.ib(factory=requests.Session, repr=False)
 
-    def _search(self, coordinate, alpha, delta, cone,
+    def _search(self, coordinate_system, alpha, delta, cone,
                 distance=None, velocity=None):
 
         # The validations
-        if coordinate not in Coordinate:
+        if coordinate_system not in CoordinateSystem:
             raise TypeError(
-                "coordinate must be a member of pycf3.Coordinate enum")
+                "coordinate_system must be a member of "
+                "pycf3.CoordinateSystem enum")
 
         if not isinstance(alpha, (int, float)):
-            raise TypeError(f"{ALPHA[coordinate]} must be int or float")
+            raise TypeError(f"{ALPHA[coordinate_system]} must be int or float")
 
         if not isinstance(delta, (int, float)):
-            raise TypeError(f"{DELTA[coordinate]} must be int or float")
+            raise TypeError(f"{DELTA[coordinate_system]} must be int or float")
         elif not (-90 <= delta <= 90):
             raise ValueError(
-                f"{DELTA[coordinate]} must be >= -90 and <= 90")
+                f"{DELTA[coordinate_system]} must be >= -90 and <= 90")
 
         if not isinstance(cone, (int, float)):
             raise TypeError(f"cone must be int or float")
@@ -149,7 +173,7 @@ class CF3:
             veldist = -1
 
         payload = {
-            "coordinate": coordinate.value,
+            "coordinate": coordinate_system.value,
             "alfa": alpha,
             "delta": delta,
             "cone": cone,
@@ -158,30 +182,32 @@ class CF3:
             "veldist": veldist}
 
         rresponse = self.session.post(self.url, payload)
+        parsed_rresponse = pq.PyQuery(rresponse.text)
 
         response = _Response(
-            coordinate=coordinate, alpha=alpha, delta=delta, cone=cone,
-            distance=distance, velocity=velocity, response_=rresponse)
+            coordinate=coordinate_system, alpha=alpha, delta=delta, cone=cone,
+            distance=distance, velocity=velocity,
+            response_=rresponse, d_=parsed_rresponse)
 
         return response
 
     def equatorial_search(self, ra=187.78917, dec=13.33386, cone=10.0,
                           distance=None, velocity=None):
         response = self._search(
-            Coordinate.equatorial, alpha=ra, delta=dec, cone=cone,
+            CoordinateSystem.equatorial, alpha=ra, delta=dec, cone=cone,
             distance=distance, velocity=velocity)
         return response
 
     def galactic_search(self, glon=282.96547, glat=75.41360, cone=10.0,
                         distance=None, velocity=None):
         response = self._search(
-            Coordinate.galactic, alpha=glon, delta=glat, cone=cone,
+            CoordinateSystem.galactic, alpha=glon, delta=glat, cone=cone,
             distance=distance, velocity=velocity)
         return response
 
     def supergalactic_search(self, sgl=102.0, sgb=-2.0, cone=10.0,
                              distance=None, velocity=None):
         response = self._search(
-            Coordinate.supergalactic, alpha=sgl, delta=sgb, cone=cone,
+            CoordinateSystem.supergalactic, alpha=sgl, delta=sgb, cone=cone,
             distance=distance, velocity=velocity)
         return response

@@ -23,6 +23,8 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 import pickle
 from unittest import mock
 
+from numpy import testing as npt
+
 import pytest
 
 import pycf3
@@ -45,6 +47,13 @@ class TestCaseEquatorial:
         assert response.Vls_Observed_ is None
         assert response.Vcls_Adjusted_ is None
 
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+
     def test_distance_10(self):
         with open("mock_data/tcEquatorial_distance_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -56,6 +65,13 @@ class TestCaseEquatorial:
         assert response.Vls_Observed_ == 730.
         assert response.Vcls_Adjusted_ == 691.
 
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+
     def test_velocity_10(self):
         with open("mock_data/tcEquatorial_velocity_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -66,6 +82,13 @@ class TestCaseEquatorial:
 
         assert response.Vls_Observed_ is None
         assert response.Vcls_Adjusted_ is None
+
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
 
     def test_ra_not_number(self):
         cf3 = pycf3.CF3()
@@ -130,6 +153,13 @@ class TestCaseGalactic:
         assert response.Vls_Observed_ is None
         assert response.Vcls_Adjusted_ is None
 
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+
     def test_distance_10(self):
         with open("mock_data/tcGalactic_distance_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -141,6 +171,13 @@ class TestCaseGalactic:
         assert response.Vls_Observed_ == 730.
         assert response.Vcls_Adjusted_ == 691.
 
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+
     def test_velocity_10(self):
         with open("mock_data/tcGalactic_velocity_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -151,6 +188,13 @@ class TestCaseGalactic:
 
         assert response.Vls_Observed_ is None
         assert response.Vcls_Adjusted_ is None
+
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
 
     def test_glon_not_number(self):
         cf3 = pycf3.CF3()
@@ -215,6 +259,14 @@ class TestCaseSuperGalactic:
         assert response.Vls_Observed_ is None
         assert response.Vcls_Adjusted_ is None
 
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+
+
     def test_distance_10(self):
         with open("mock_data/tcSuperGalactic_distance_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -226,6 +278,13 @@ class TestCaseSuperGalactic:
         assert response.Vls_Observed_ == 730.
         assert response.Vcls_Adjusted_ == 691.
 
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+
     def test_velocity_10(self):
         with open("mock_data/tcSuperGalactic_velocity_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -236,6 +295,13 @@ class TestCaseSuperGalactic:
 
         assert response.Vls_Observed_ is None
         assert response.Vcls_Adjusted_ is None
+
+        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
 
     def test_sgl_not_number(self):
         cf3 = pycf3.CF3()
