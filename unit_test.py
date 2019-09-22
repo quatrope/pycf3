@@ -42,17 +42,17 @@ class TestCaseEquatorial:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.equatorial_search()
+            result = cf3.equatorial_search()
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
         with open("mock_data/tcEquatorial_distance_10.pkl", "rb") as fp:
@@ -60,17 +60,17 @@ class TestCaseEquatorial:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.equatorial_search(distance=10)
+            result = cf3.equatorial_search(distance=10)
 
-        assert response.Vls_Observed_ == 730.
-        assert response.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.
+        assert result.Vcls_Adjusted_ == 691.
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
         with open("mock_data/tcEquatorial_velocity_10.pkl", "rb") as fp:
@@ -78,17 +78,17 @@ class TestCaseEquatorial:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.equatorial_search(velocity=10)
+            result = cf3.equatorial_search(velocity=10)
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_ra_not_number(self):
         cf3 = pycf3.CF3()
@@ -148,17 +148,17 @@ class TestCaseGalactic:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.galactic_search()
+            result = cf3.galactic_search()
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
         with open("mock_data/tcGalactic_distance_10.pkl", "rb") as fp:
@@ -166,17 +166,17 @@ class TestCaseGalactic:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.galactic_search(distance=10)
+            result = cf3.galactic_search(distance=10)
 
-        assert response.Vls_Observed_ == 730.
-        assert response.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.
+        assert result.Vcls_Adjusted_ == 691.
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
         with open("mock_data/tcGalactic_velocity_10.pkl", "rb") as fp:
@@ -184,17 +184,17 @@ class TestCaseGalactic:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.galactic_search(velocity=10)
+            result = cf3.galactic_search(velocity=10)
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_glon_not_number(self):
         cf3 = pycf3.CF3()
@@ -254,17 +254,17 @@ class TestCaseSuperGalactic:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.supergalactic_search()
+            result = cf3.supergalactic_search()
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
         with open("mock_data/tcSuperGalactic_distance_10.pkl", "rb") as fp:
@@ -272,17 +272,17 @@ class TestCaseSuperGalactic:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.supergalactic_search(distance=10)
+            result = cf3.supergalactic_search(distance=10)
 
-        assert response.Vls_Observed_ == 730.
-        assert response.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.
+        assert result.Vcls_Adjusted_ == 691.
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
         with open("mock_data/tcSuperGalactic_velocity_10.pkl", "rb") as fp:
@@ -290,17 +290,17 @@ class TestCaseSuperGalactic:
 
         cf3 = pycf3.CF3()
         with mock.patch("requests.Session.post", return_value=mresponse):
-            response = cf3.supergalactic_search(velocity=10)
+            result = cf3.supergalactic_search(velocity=10)
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_sgl_not_number(self):
         cf3 = pycf3.CF3()

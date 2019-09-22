@@ -43,45 +43,45 @@ class TestCaseIntegrationEquatorial:
 
     def test_default(self):
         cf3 = pycf3.CF3()
-        response = cf3.equatorial_search()
+        result = cf3.equatorial_search()
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
         cf3 = pycf3.CF3()
-        response = cf3.equatorial_search(distance=10)
+        result = cf3.equatorial_search(distance=10)
 
-        assert response.Vls_Observed_ == 730.
-        assert response.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.
+        assert result.Vcls_Adjusted_ == 691.
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
         cf3 = pycf3.CF3()
-        response = cf3.equatorial_search(velocity=10)
+        result = cf3.equatorial_search(velocity=10)
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
 
 # =============================================================================
@@ -92,45 +92,45 @@ class TestCaseIntegrationGalactic:
 
     def test_default(self):
         cf3 = pycf3.CF3()
-        response = cf3.galactic_search()
+        result = cf3.galactic_search()
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
         cf3 = pycf3.CF3()
-        response = cf3.galactic_search(distance=10)
+        result = cf3.galactic_search(distance=10)
 
-        assert response.Vls_Observed_ == 730.
-        assert response.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.
+        assert result.Vcls_Adjusted_ == 691.
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
         cf3 = pycf3.CF3()
-        response = cf3.galactic_search(velocity=10)
+        result = cf3.galactic_search(velocity=10)
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
 
 # =============================================================================
@@ -141,42 +141,42 @@ class TestCaseIntegrationSuperGalactic:
 
     def test_default(self):
         cf3 = pycf3.CF3()
-        response = cf3.supergalactic_search()
+        result = cf3.supergalactic_search()
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
         cf3 = pycf3.CF3()
-        response = cf3.supergalactic_search(distance=10)
+        result = cf3.supergalactic_search(distance=10)
 
-        assert response.Vls_Observed_ == 730.
-        assert response.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.
+        assert result.Vcls_Adjusted_ == 691.
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
         cf3 = pycf3.CF3()
-        response = cf3.supergalactic_search(velocity=10)
+        result = cf3.supergalactic_search(velocity=10)
 
-        assert response.Vls_Observed_ is None
-        assert response.Vcls_Adjusted_ is None
+        assert result.Vls_Observed_ is None
+        assert result.Vcls_Adjusted_ is None
 
-        npt.assert_almost_equal(response.search_at_.ra, 187.78917, decimal=4)
-        npt.assert_almost_equal(response.search_at_.dec, 13.33386, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glon, 282.96547, decimal=4)
-        npt.assert_almost_equal(response.search_at_.glat, 75.41360, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgl, 102.00000, decimal=4)
-        npt.assert_almost_equal(response.search_at_.sgb, -2.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)

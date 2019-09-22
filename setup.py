@@ -19,6 +19,9 @@
 # IMPORTS
 # =============================================================================
 
+import os
+import pathlib
+
 from ez_setup import use_setuptools
 use_setuptools()
 
@@ -29,14 +32,21 @@ from setuptools import setup # noqa
 # CONSTANTS
 # =============================================================================
 
+PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
+
 REQUIREMENTS = ["numpy", "requests", "attrs", "bokeh", "pyquery"]
 
-with open("README.md") as fp:
+with open(PATH / "README.md") as fp:
     LONG_DESCRIPTION = fp.read()
 
 DESCRIPTION = " ".join(
     [l for l in LONG_DESCRIPTION.splitlines()
      if l.strip() and not l.startswith("[")][1:3])
+
+with open(PATH / "pycf3.py") as fp:
+    VERSION = [
+        l for l in fp.readlines() if l.startswith("__version__")
+    ][0].split("=", 1)[-1].strip().replace('"', "")
 
 
 # =============================================================================
@@ -46,7 +56,7 @@ DESCRIPTION = " ".join(
 def do_setup():
     setup(
         name="pycf3",
-        version="2019.9",
+        version=VERSION,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         long_description_content_type='text/markdown',

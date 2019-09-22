@@ -22,6 +22,11 @@ More information: http://edd.ifa.hawaii.edu/CF3calculator/
 """
 
 
+__all__ = ["CF3"]
+
+__version__ = "2019.9"
+
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -77,7 +82,7 @@ class SearchAt:
 
 
 @attr.s(cmp=False, hash=False, frozen=True)
-class Response:
+class Result:
     coordinate = attr.ib()
     alpha = attr.ib()
     delta = attr.ib()
@@ -131,7 +136,7 @@ class Response:
 @attr.s(cmp=False, hash=False, frozen=True)
 class CF3:
     """Client to access the *Cosmicflows-3 Distance-Velocity Calculator*
-    *at distances* (http://edd.ifa.hawaii.edu/CF3calculator/)
+    (http://edd.ifa.hawaii.edu/CF3calculator/)
 
     Parameters
     ----------
@@ -193,18 +198,43 @@ class CF3:
             "vel_t": "" if velocity is None else velocity,
             "veldist": veldist}
 
-        rresponse = self.session.post(self.url, payload)
-        parsed_rresponse = pq.PyQuery(rresponse.text)
+        response = self.session.post(self.url, payload)
+        parsed_response = pq.PyQuery(response.text)
 
-        response = Response(
+        result = Result(
             coordinate=coordinate_system, alpha=alpha, delta=delta, cone=cone,
             distance=distance, velocity=velocity,
-            response_=rresponse, d_=parsed_rresponse)
+            response_=response, d_=parsed_response)
 
-        return response
+        return result
 
     def equatorial_search(self, ra=187.78917, dec=13.33386, cone=10.0,
                           distance=None, velocity=None):
+        """Search around the sky position expressed in equatorial coordinates
+        (J2000 as 360° decimal) in degrees.
+
+        Parameters
+        ----------
+
+        ra : ``int`` or ``float`` (default: ``187.78917``)
+            Right ascension.
+        dec : ``int`` or ``float`` (default: ``13.33386``)
+            Declination. dec must be >= -90 and <= 90
+        cone : ``int`` or ``float`` (default: ``10``)
+            Points within this cone angle. cone must be >= 0.
+        distance : ``int``, ``float`` or ``None`` (default: ``None``)
+            Returns model velocity in km/s.
+        velocity : ``int``, ``float`` or ``None`` (default: ``None``)
+            Returns model distance(s) in Mpc - potentially more than one value.
+
+        Returns
+        -------
+
+        pycf3.Result :
+            Result object that automatically parses the entire model
+            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+
+        """
         response = self._search(
             CoordinateSystem.equatorial, alpha=ra, delta=dec, cone=cone,
             distance=distance, velocity=velocity)
@@ -212,6 +242,31 @@ class CF3:
 
     def galactic_search(self, glon=282.96547, glat=75.41360, cone=10.0,
                         distance=None, velocity=None):
+        """Search around the sky position expressed in galactic coordinates
+        (J2000 as 360° decimal) in degrees.
+
+        Parameters
+        ----------
+
+        glon : ``int`` or ``float`` (default: ``282.96547``)
+            Galactic longitude.
+        glat: ``int`` or ``float`` (default: ``75.41360``)
+            Galactic latitude. dec must be >= -90 and <= 90
+        cone : ``int`` or ``float`` (default: ``10``)
+            Points within this cone angle. cone must be >= 0.
+        distance : ``int``, ``float`` or ``None`` (default: ``None``)
+            Returns model velocity in km/s.
+        velocity : ``int``, ``float`` or ``None`` (default: ``None``)
+            Returns model distance(s) in Mpc - potentially more than one value.
+
+        Returns
+        -------
+
+        pycf3.Result :
+            Result object that automatically parses the entire model
+            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+
+        """
         response = self._search(
             CoordinateSystem.galactic, alpha=glon, delta=glat, cone=cone,
             distance=distance, velocity=velocity)
@@ -219,6 +274,31 @@ class CF3:
 
     def supergalactic_search(self, sgl=102.0, sgb=-2.0, cone=10.0,
                              distance=None, velocity=None):
+        """Search around the sky position expressed in super-galactic
+        coordinates (J2000 as 360° decimal) in degrees.
+
+        Parameters
+        ----------
+
+        sgl : ``int`` or ``float`` (default: ``102``)
+            Super-galactic longitude.
+        sgb: ``int`` or ``float`` (default: ``-2``)
+            Super-galactic latitude. dec must be >= -90 and <= 90
+        cone : ``int`` or ``float`` (default: ``10``)
+            Points within this cone angle. cone must be >= 0.
+        distance : ``int``, ``float`` or ``None`` (default: ``None``)
+            Returns model velocity in km/s.
+        velocity : ``int``, ``float`` or ``None`` (default: ``None``)
+            Returns model distance(s) in Mpc - potentially more than one value.
+
+        Returns
+        -------
+
+        pycf3.Result :
+            Result object that automatically parses the entire model
+            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+
+        """
         response = self._search(
             CoordinateSystem.supergalactic, alpha=sgl, delta=sgb, cone=cone,
             distance=distance, velocity=velocity)
