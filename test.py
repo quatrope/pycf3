@@ -20,6 +20,9 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 # IMPORTS
 # =============================================================================
 
+import pickle
+from unittest import mock
+
 import pycf3
 
 
@@ -30,4 +33,9 @@ import pycf3
 class TestCaseEquatorial:
 
     def test_default(self):
-        pass
+        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cf3 = pycf3.CF3()
+        with mock.patch("requests.Session.post", return_value=mresponse):
+            response = cf3.equatorial_search()

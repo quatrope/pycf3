@@ -64,26 +64,35 @@ URL = "http://edd.ifa.hawaii.edu/CF3calculator/getData.php"
 # RESPONSE OBJECT
 # =============================================================================
 
-@attr.s(cmp=False, hash=False, repr=False)
+@attr.s(cmp=False, hash=False, frozen=True)
 class _Response:
-    search = attr.ib()
-    rresponse = attr.ib()
+    coordinate = attr.ib()
+    alpha = attr.ib()
+    delta = attr.ib()
+    cone = attr.ib()
+    distance = attr.ib()
+    velocity = attr.ib()
+    response_ = attr.ib(repr=False)
 
 
 # =============================================================================
 # CLIENT
 # =============================================================================
 
-@attr.s(cmp=False, hash=False)
+@attr.s(cmp=False, hash=False, frozen=True)
 class CF3:
 
     url = attr.ib(default=URL, repr=True)
-    session = attr.ib(default=attr.Factory(requests.Session))
+    session = attr.ib(default=attr.Factory(requests.Session), repr=False)
 
     def _search(self, coordinate, alpha, delta, cone,
                 distance=None, velocity=None):
 
         # The validations
+        if coordinate not in Coordinate:
+            raise TypeError(
+                "coordinate must be a member of pycf3.Coordinate enum")
+
         if not isinstance(alpha, (int, float)):
             raise TypeError(f"{ALPHA[coordinate]} must be int or float")
 
@@ -113,7 +122,7 @@ class CF3:
             veldist = -1
 
         payload = {
-            "coordinate": coordinate,
+            "coordinate": coordinate.value,
             "alfa": alpha,
             "delta": delta,
             "cone": cone,
@@ -121,7 +130,13 @@ class CF3:
             "vel_t": "" if velocity is None else velocity,
             "veldist": veldist}
 
-        import ipdb; ipdb.set_trace()
+        rresponse = self.session.post(self.url, payload)
+
+        response = _Response(
+            coordinate=coordinate, alpha=alpha, delta=delta, cone=cone,
+            distance=distance, velocity=velocity, response_=rresponse)
+
+        return response
 
     def equatorial_search(self, ra=187.78917, dec=13.33386, cone=10.0,
                           distance=None, velocity=None):
