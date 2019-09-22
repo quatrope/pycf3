@@ -23,6 +23,9 @@ Warning this code is SLOW!
 # IMPORTS
 # =============================================================================
 
+import random
+import time
+
 from numpy import testing as npt
 
 import pycf3
@@ -33,6 +36,10 @@ import pycf3
 # =============================================================================
 
 class TestCaseIntegrationEquatorial:
+
+    def teardown_method(self, method):
+        s = random.randint(0, 1) + random.random()
+        time.sleep(s)
 
     def test_default(self):
         cf3 = pycf3.CF3()
