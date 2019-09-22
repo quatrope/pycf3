@@ -30,6 +30,8 @@ from enum import Enum
 
 import attr
 
+import pyquery as pq
+
 import requests
 
 
@@ -72,7 +74,32 @@ class _Response:
     cone = attr.ib()
     distance = attr.ib()
     velocity = attr.ib()
+
     response_ = attr.ib(repr=False)
+    d_ = attr.ib(repr=False, init=False)
+
+    Vls_Observed_ = attr.ib(repr=False, init=False)
+    Vcls_Adjusted_ = attr.ib(repr=False, init=False)
+
+    @d_.default
+    def _d__default(self):
+        return pq.PyQuery(self.response_.text)
+
+    @Vls_Observed_.default
+    def _Vls_Observed__default(self):
+        if self.distance is None:
+            return None
+        vlso_table = self.d_(
+            "span:contains(' - Observed')").parents("table#calc")
+        return float(vlso_table.find("td#calc")[1].text)
+
+    @Vcls_Adjusted_.default
+    def _Vcls_Adjusted__default(self):
+        if self.distance is None:
+            return None
+        vclso_table = self.d_(
+            "span:contains(' - Adjusted')").parents("table#calc")
+        return float(vclso_table.find("td#calc")[1].text)
 
 
 # =============================================================================
@@ -83,7 +110,7 @@ class _Response:
 class CF3:
 
     url = attr.ib(default=URL, repr=True)
-    session = attr.ib(default=attr.Factory(requests.Session), repr=False)
+    session = attr.ib(factory=requests.Session, repr=False)
 
     def _search(self, coordinate, alpha, delta, cone,
                 distance=None, velocity=None):
@@ -113,7 +140,7 @@ class CF3:
         elif distance is not None:
             if not isinstance(distance, (int, float)):
                 raise TypeError("distance must be int, float or None")
-                veldist = 0
+            veldist = 0
         elif velocity is not None:
             if not isinstance(velocity, (int, float)):
                 raise TypeError("distance must be int, float or None")

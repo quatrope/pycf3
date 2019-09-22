@@ -29,7 +29,7 @@ from setuptools import setup # noqa
 # CONSTANTS
 # =============================================================================
 
-REQUIREMENTS = ["numpy", "requests", "attrs"]
+REQUIREMENTS = ["numpy", "requests", "attrs", "bokeh", "pyquery"]
 
 with open("README.md") as fp:
     LONG_DESCRIPTION = fp.read()
