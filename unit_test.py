@@ -119,20 +119,6 @@ class TestCaseEquatorial:
 
 class TestCaseGalactic:
 
-    def __persist(self):
-        coord = "Galactic"
-        conf = {
-            f"tc{coord}_default.pkl": {},
-            f"tc{coord}_distance_10.pkl": {"distance": 10},
-            f"tc{coord}_velocity_10.pkl": {"velocity": 10},
-        }
-        for fname, params in conf.items():
-            cf3 = pycf3.CF3()
-            response = cf3.galactic_search(**params)
-            with open(f"mock_data/{fname}", "wb") as fp:
-                pickle.dump(response.response_, fp)
-
-
     def test_default(self):
         with open("mock_data/tcGalactic_default.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -210,3 +196,88 @@ class TestCaseGalactic:
         cf3 = pycf3.CF3()
         with pytest.raises(TypeError):
             cf3.galactic_search(distance="foo")
+
+
+# =============================================================================
+# SUPER-GALACTIC TEST CASE
+# =============================================================================
+
+class TestCaseSuperGalactic:
+
+    def test_default(self):
+        with open("mock_data/tcSuperGalactic_default.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cf3 = pycf3.CF3()
+        with mock.patch("requests.Session.post", return_value=mresponse):
+            response = cf3.supergalactic_search()
+
+        assert response.Vls_Observed_ is None
+        assert response.Vcls_Adjusted_ is None
+
+    def test_distance_10(self):
+        with open("mock_data/tcSuperGalactic_distance_10.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cf3 = pycf3.CF3()
+        with mock.patch("requests.Session.post", return_value=mresponse):
+            response = cf3.supergalactic_search(distance=10)
+
+        assert response.Vls_Observed_ == 730.
+        assert response.Vcls_Adjusted_ == 691.
+
+    def test_velocity_10(self):
+        with open("mock_data/tcSuperGalactic_velocity_10.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cf3 = pycf3.CF3()
+        with mock.patch("requests.Session.post", return_value=mresponse):
+            response = cf3.supergalactic_search(velocity=10)
+
+        assert response.Vls_Observed_ is None
+        assert response.Vcls_Adjusted_ is None
+
+    def test_sgl_not_number(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(TypeError):
+            cf3.supergalactic_search(sgl="foo")
+
+    def test_sgb_not_number(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(TypeError):
+            cf3.supergalactic_search(sgb="foo")
+
+    def test_sgb_lt_m90(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(ValueError):
+            cf3.supergalactic_search(sgb=-91)
+
+    def test_sgb_gt_90(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(ValueError):
+            cf3.supergalactic_search(sgb=91)
+
+    def test_cone_not_number(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(TypeError):
+            cf3.supergalactic_search(cone="foo")
+
+    def test_cone_lt_0(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(ValueError):
+            cf3.supergalactic_search(cone=-91)
+
+    def test_distance_velocity_together(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(ValueError):
+            cf3.supergalactic_search(distance=10, velocity=10)
+
+    def test_distance_not_number(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(TypeError):
+            cf3.supergalactic_search(distance="foo")
+
+    def test_velocity_not_number(self):
+        cf3 = pycf3.CF3()
+        with pytest.raises(TypeError):
+            cf3.supergalactic_search(distance="foo")
