@@ -32,6 +32,43 @@ from the Wiener filter model of
 More information: http://edd.ifa.hawaii.edu/CF3calculator/
 
 
+Help & discussion mailing list
+------------------------------
+
+
+**You can contact me at:** jbc.develop@gmail.com
+
+
+Code Repository & Issues
+------------------------
+
+https://github.com/quatrope/pycf3
+
+
+License
+-------
+
+feets is under
+`The BSD 3 <https://raw.githubusercontent.com/quatrope/pycf3/master/LICENSE>`__
+
+The BSD 3-clause license allows you almost unlimited freedom with the software so long as you include the BSD copyright and license notice in it (found in Fulltext).
+
+
+Authors
+-------
+
+Juan BC
+
+jbc.develop@gmail.com
+
+`IATE <http://iate.oac.uncor.edu/>`_ - `CIFASIS <https://www.cifasis-conicet.gov.ar/>`_
+
+This project is part of the `QuatroPe <https://github.com/quatrope>`_ scientific
+tools.
+
+
+Contents
+--------
 
 .. toctree::
     :maxdepth: 2

@@ -25,7 +25,7 @@ import pathlib
 from ez_setup import use_setuptools
 use_setuptools()
 
-from setuptools import setup # noqa
+from setuptools import setup
 
 
 # =============================================================================
