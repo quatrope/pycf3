@@ -22,7 +22,7 @@ More information: http://edd.ifa.hawaii.edu/CF3calculator/
 """
 
 
-__all__ = ["CF3"]
+__all__ = ["CF3", "Result"]
 
 __version__ = "2019.9"
 
@@ -31,6 +31,7 @@ __version__ = "2019.9"
 # IMPORTS
 # =============================================================================
 
+from collections import namedtuple
 from enum import Enum
 
 import attr
@@ -71,18 +72,71 @@ URL = "http://edd.ifa.hawaii.edu/CF3calculator/getData.php"
 # RESPONSE OBJECT
 # =============================================================================
 
-@attr.s(frozen=True)
-class SearchAt:
-    ra = attr.ib()
-    dec = attr.ib()
-    glon = attr.ib()
-    glat = attr.ib()
-    sgl = attr.ib()
-    sgb = attr.ib()
+SearchAt = namedtuple("SearchAt", ['ra', 'dec', 'glon', 'glat', 'sgl', 'sgb'])
 
 
 @attr.s(cmp=False, hash=False, frozen=True)
 class Result:
+    r"""Parsed result of the *Cosmicflows-3 Distance-Velocity Calculator*-
+
+    Parameters
+    ----------
+
+    coordinate : ``Coordinate``
+        Coordinate system used to create this result.
+    alpha : ``int`` or ``float``
+        :math:`\alpha` value for the coordinate system.
+    delta : ``int`` or ``float``
+        :math:`\delta` value for the coordinate system.
+    cone : ``int`` or ``float``
+        Cone angle.
+    distance : ``int``, ``float`` or ``None``
+        Returns model velocity in km/s.
+    velocity : ``int``, ``float`` or ``None``
+        Returns model distance(s) in Mpc - potentially more than one value.
+
+    Attributes
+    ----------
+
+    response_ : ``requests.Response``
+        Original response object create by the *requests* library.
+        More information: https://2.python-requests.org
+    d_ : ``pyquery.PyQuery``
+        Parsed *HTML* response inside a PyQuery object.
+        More information: https://pythonhosted.org/pyquery/
+    search_at_ : ``pycf3.SearhAt``
+        :math:`\alpha` and :math:`\delta` in all the available coordinate
+        systems.
+    Vls_Observed_ : ``float`` or ``None``
+        Observed velocity, :math:`V_{ls}`, vs. distance. `Vls_Observed_` is
+        ``None`` if `distance` is ``None``
+    Vcls_Adjusted_ : ``float`` or ``None``
+        Cosmologically	adjusted velocity, :math:`V_{ls}^c`, vs. distance.
+        The corrected velocity :math:`V_{ls}^c` is related to the observed
+        velocity :math:`V_{ls}` by:
+
+        .. math::
+
+            V_{ls}^c = f(z)V_{ls}
+
+        where
+
+        .. math::
+
+            f(z) = 1+1/2(1-q_0)z-1/6(2-q_0-3q_0^2)z^2
+
+        .. math::
+
+            q_0 = 1/2(\Omega_m-2\Omega_{\Lambda}) = -0.595
+
+        when :math:`\Omega_m=0.27`, :math:`\Omega_{\Lambda}=0.73` and
+        :math:`z=V_{ls}/c`.
+
+        `Vcls_Adjusted_` is ``None`` if `distance` is ``None``.
+
+
+    """
+
     coordinate = attr.ib()
     alpha = attr.ib()
     delta = attr.ib()
