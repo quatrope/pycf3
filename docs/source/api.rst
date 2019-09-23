@@ -1,6 +1,5 @@
-pycf3 module
-============
-
+API - ``pycf3`` module
+======================
 
 
 .. automodule:: pycf3

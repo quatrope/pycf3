@@ -74,7 +74,9 @@ Contents
     :maxdepth: 2
     :caption: Contents:
 
-    pycf3
+    install
+    tutorial.ipynb
+    api
 
 
 Indices and tables

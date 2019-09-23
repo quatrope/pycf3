@@ -41,7 +41,15 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
-    'sphinx.ext.napoleon']
+    'sphinx.ext.napoleon',
+    'nbsphinx']
+
+exclude_patterns = ['_build', 'source/.ipynb_checkpoints/*']
+
+numpydoc_class_members_toctree = False
+
+nbsphinx_execute = 'never'  # access the server is slow
+
 
 
 
