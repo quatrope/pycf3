@@ -1,13 +1,19 @@
 language: python
 sudo: false
+
 addons:
   apt_packages:
     - pandoc
+    - texlive-full
+    - texlive-xetex
+
 install:
   - pip install tox
-script:
+
+  script:
   - tox -r
-matrix:
+
+  matrix:
     include:
         - python: 3.7
           env: TOXENV=style
