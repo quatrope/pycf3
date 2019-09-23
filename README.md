@@ -1,6 +1,8 @@
 # pycf3 - Cosmicflows-3 Distance-Velocity Calculator client for Python
 
 [![Build Status](https://travis-ci.org/quatrope/pycf3.svg?branch=master)](https://travis-ci.org/quatrope/pycf3)
+[![Documentation Status](https://readthedocs.org/projects/pycf3/badge/?version=latest)](https://pycf3.readthedocs.io/en/latest/?badge=latest)
+
 
 
 Python client for Cosmicflows-3 Distance-Velocity Calculator at distances less
