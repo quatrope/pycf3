@@ -16,30 +16,30 @@ script:
 
 matrix:
     include:
-        - python: 3.7
-          env: TOXENV=style
-          dist: xenial
-          sudo: true
+      - python: 3.7
+        env: TOXENV=style
+        dist: xenial
+        sudo: true
 
-        - python: 3.7
-          env: TOXENV=coverage
-          dist: xenial
-          sudo: true
+      - python: 3.7
+        env: TOXENV=coverage
+        dist: xenial
+        sudo: true
 
-        - python: 3.7
-          env: TOXENV=docs
-          dist: xenial
-          sudo: true
+      - python: 3.7
+        env: TOXENV=docs
+        dist: xenial
+        sudo: true
 
-        - python: 3.7
-          env: TOXENV=py37
-          dist: xenial
-          sudo: true
+      - python: 3.7
+        env: TOXENV=py37
+        dist: xenial
+        sudo: true
 
-        - python: 3.7
-          env: TOXENV=integration
-          dist: xenial
-          sudo: true
+      - python: 3.7
+        env: TOXENV=integration
+        dist: xenial
+        sudo: true
 
 
 
