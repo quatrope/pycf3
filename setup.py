@@ -36,12 +36,13 @@ PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
 REQUIREMENTS = ["numpy", "requests", "attrs", "bokeh", "pyquery"]
 
-with open(PATH / "README.md") as fp:
+with open(PATH / "README.rst") as fp:
     LONG_DESCRIPTION = fp.read()
 
-DESCRIPTION = " ".join(
-    [l for l in LONG_DESCRIPTION.splitlines()
-     if l.strip() and not l.startswith("[")][1:3])
+DESCRIPTION = [
+    line for line in
+    LONG_DESCRIPTION.split("Description\n-----------", 1)[-1].splitlines()
+    if line.strip()][0]
 
 with open(PATH / "pycf3.py") as fp:
     VERSION = [
@@ -59,7 +60,6 @@ def do_setup():
         version=VERSION,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
-        long_description_content_type='text/markdown',
         author="QuatroPe",
         author_email="jbc.develop@gmail.com",
         url="https://github.com/quatrope/pycf3",
