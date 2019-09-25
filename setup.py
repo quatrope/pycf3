@@ -34,7 +34,7 @@ from setuptools import setup
 
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
-REQUIREMENTS = ["numpy", "requests", "attrs", "bokeh", "pyquery"]
+REQUIREMENTS = ["numpy", "requests", "attrs", "bokeh", "pyquery", "diskcache"]
 
 with open(PATH / "README.rst") as fp:
     LONG_DESCRIPTION = fp.read()

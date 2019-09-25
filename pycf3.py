@@ -22,9 +22,9 @@ More information: http://edd.ifa.hawaii.edu/CF3calculator/
 """
 
 
-__all__ = ["CF3", "Result"]
+__all__ = ["CF3", "Result", "NoCache"]
 
-__version__ = "2019.9"
+__version__ = "2019.9.25"
 
 
 # =============================================================================
@@ -33,8 +33,12 @@ __version__ = "2019.9"
 
 from collections import namedtuple
 from enum import Enum
+import typing as t
+import os
 
 import attr
+
+import diskcache as dcache
 
 import pyquery as pq
 
@@ -66,6 +70,35 @@ DELTA = {
 
 
 URL = "http://edd.ifa.hawaii.edu/CF3calculator/getData.php"
+
+
+PYCF3_DATA = os.path.expanduser(os.path.join('~', 'pycf3_data'))
+
+
+DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
+
+
+# =============================================================================
+# NO CACHE CLASS
+# =============================================================================
+
+class NoCache:
+    """Implements a no cache with the minimun methods to be useful with
+    CF3 class"""
+
+    def get(self, key, default=None, *args, **kwargs):
+        """Always return the ``default``"""
+        return default
+
+    def set(self, key, value, *args, **kwargs):
+        """This method do nothing. Always return True"""
+        return True
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exeption):
+        pass
 
 
 # =============================================================================
@@ -195,16 +228,39 @@ class CF3:
     Parameters
     ----------
 
-    url : str (default: ``pycf3.URL``)
+    url : ``str`` (default: ``pycf3.URL``)
         The endpoint of the cosmic flow calculator.
     session : ``request.Session`` (default: ``None``)
         The session to use to send the requests. By default a session without
         any configuration is created. More info: https://2.python-requests.org
+    cache : ``diskcache.Cache``, ``diskcache.Fanout``,
+            ``pycf3.NoCache`` or ``None`` (default: ``None``)
+        Any instance of ``diskcache.Cache``, ``diskcache.Fanout`` or
+        ``None`` (Default). If it's ``None`` a ``diskcache.Cache`` istance
+        is created with the parameter ``directory = pycf3.DEFAULT_CACHE_DIR``.
+        More information: http://www.grantjenks.com/docs/diskcache
+    cache_expire : ``float`` or None (default=``None``)
+        Seconds until item expires (default ``None``, no expiry)
+        More information: http://www.grantjenks.com/docs/diskcache
 
     """
 
+    # =========================================================================
+    # ATTRS SETUP
+    # =========================================================================
+
     url: str = attr.ib(default=URL, repr=True)
     session: requests.Session = attr.ib(factory=requests.Session, repr=False)
+    cache: t.Union[dcache.Cache, dcache.FanoutCache] = attr.ib()
+    cache_expire: float = attr.ib(default=None, repr=False)
+
+    @cache.default
+    def _cache_default(self):
+        return dcache.Cache(directory=DEFAULT_CACHE_DIR)
+
+    # =========================================================================
+    # INTERNAL
+    # =========================================================================
 
     def _search(self, coordinate_system, alpha, delta, cone,
                 distance=None, velocity=None):
@@ -252,7 +308,19 @@ class CF3:
             "vel_t": "" if velocity is None else velocity,
             "veldist": veldist}
 
-        response = self.session.post(self.url, payload)
+        # start the cache orchestration
+        base = (coordinate_system.value,)
+        key = dcache.core.args_to_key(
+            base=base, args=(self.url,), kwargs=payload, typed=False)
+
+        with self.cache as cache:
+            result = cache.get(key, default=dcache.core.ENOVAL, retry=True)
+            if result == dcache.core.ENOVAL:
+                response = self.session.post(self.url, payload)
+                cache.set(
+                    key, response, expire=self.cache_expire,
+                    tag="@".join(key[:2]), retry=True)
+
         parsed_response = pq.PyQuery(response.text)
 
         result = Result(
@@ -261,6 +329,10 @@ class CF3:
             response_=response, d_=parsed_response)
 
         return result
+
+    # =========================================================================
+    # PUBLIC API
+    # =========================================================================
 
     def equatorial_search(self, ra=187.78917, dec=13.33386, cone=10.0,
                           distance=None, velocity=None):

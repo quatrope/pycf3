@@ -40,7 +40,7 @@ class TestCaseEquatorial:
         with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.equatorial_search()
 
@@ -58,7 +58,7 @@ class TestCaseEquatorial:
         with open("mock_data/tcEquatorial_distance_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.equatorial_search(distance=10)
 
@@ -76,7 +76,7 @@ class TestCaseEquatorial:
         with open("mock_data/tcEquatorial_velocity_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.equatorial_search(velocity=10)
 
@@ -91,47 +91,47 @@ class TestCaseEquatorial:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_ra_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.equatorial_search(ra="foo")
 
     def test_dec_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.equatorial_search(dec="foo")
 
     def test_dec_lt_m90(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.equatorial_search(dec=-91)
 
     def test_dec_gt_90(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.equatorial_search(dec=91)
 
     def test_cone_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.equatorial_search(cone="foo")
 
     def test_cone_lt_0(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.equatorial_search(cone=-91)
 
     def test_distance_velocity_together(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.equatorial_search(distance=10, velocity=10)
 
     def test_distance_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.equatorial_search(distance="foo")
 
     def test_velocity_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.equatorial_search(distance="foo")
 
@@ -146,7 +146,7 @@ class TestCaseGalactic:
         with open("mock_data/tcGalactic_default.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.galactic_search()
 
@@ -164,7 +164,7 @@ class TestCaseGalactic:
         with open("mock_data/tcGalactic_distance_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.galactic_search(distance=10)
 
@@ -182,7 +182,7 @@ class TestCaseGalactic:
         with open("mock_data/tcGalactic_velocity_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.galactic_search(velocity=10)
 
@@ -197,47 +197,47 @@ class TestCaseGalactic:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_glon_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.galactic_search(glon="foo")
 
     def test_glat_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.galactic_search(glat="foo")
 
     def test_glat_lt_m90(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.galactic_search(glat=-91)
 
     def test_glat_gt_90(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.galactic_search(glat=91)
 
     def test_cone_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.galactic_search(cone="foo")
 
     def test_cone_lt_0(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.galactic_search(cone=-91)
 
     def test_distance_velocity_together(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.galactic_search(distance=10, velocity=10)
 
     def test_distance_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.galactic_search(distance="foo")
 
     def test_velocity_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.galactic_search(distance="foo")
 
@@ -252,7 +252,7 @@ class TestCaseSuperGalactic:
         with open("mock_data/tcSuperGalactic_default.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.supergalactic_search()
 
@@ -270,7 +270,7 @@ class TestCaseSuperGalactic:
         with open("mock_data/tcSuperGalactic_distance_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.supergalactic_search(distance=10)
 
@@ -288,7 +288,7 @@ class TestCaseSuperGalactic:
         with open("mock_data/tcSuperGalactic_velocity_10.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
 
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.supergalactic_search(velocity=10)
 
@@ -303,46 +303,46 @@ class TestCaseSuperGalactic:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_sgl_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.supergalactic_search(sgl="foo")
 
     def test_sgb_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.supergalactic_search(sgb="foo")
 
     def test_sgb_lt_m90(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.supergalactic_search(sgb=-91)
 
     def test_sgb_gt_90(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.supergalactic_search(sgb=91)
 
     def test_cone_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.supergalactic_search(cone="foo")
 
     def test_cone_lt_0(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.supergalactic_search(cone=-91)
 
     def test_distance_velocity_together(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(ValueError):
             cf3.supergalactic_search(distance=10, velocity=10)
 
     def test_distance_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.supergalactic_search(distance="foo")
 
     def test_velocity_not_number(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.supergalactic_search(distance="foo")
