@@ -25,8 +25,14 @@ Warning this code is SLOW!
 
 import random
 import time
+import pickle
+from unittest import mock
+
+import pytest
 
 from numpy import testing as npt
+
+import diskcache as dcache
 
 import pycf3
 
@@ -42,7 +48,7 @@ class TestCaseIntegrationEquatorial:
         time.sleep(s)
 
     def test_default(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.equatorial_search()
 
         assert result.Vls_Observed_ is None
@@ -56,7 +62,7 @@ class TestCaseIntegrationEquatorial:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.equatorial_search(distance=10)
 
         assert result.Vls_Observed_ == 730.
@@ -70,7 +76,7 @@ class TestCaseIntegrationEquatorial:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.equatorial_search(velocity=10)
 
         assert result.Vls_Observed_ is None
@@ -90,8 +96,12 @@ class TestCaseIntegrationEquatorial:
 
 class TestCaseIntegrationGalactic:
 
+    def teardown_method(self, method):
+        s = random.randint(0, 1) + random.random()
+        time.sleep(s)
+
     def test_default(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.galactic_search()
 
         assert result.Vls_Observed_ is None
@@ -105,7 +115,7 @@ class TestCaseIntegrationGalactic:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.galactic_search(distance=10)
 
         assert result.Vls_Observed_ == 730.
@@ -119,7 +129,7 @@ class TestCaseIntegrationGalactic:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.galactic_search(velocity=10)
 
         assert result.Vls_Observed_ is None
@@ -139,8 +149,12 @@ class TestCaseIntegrationGalactic:
 
 class TestCaseIntegrationSuperGalactic:
 
+    def teardown_method(self, method):
+        s = random.randint(0, 1) + random.random()
+        time.sleep(s)
+
     def test_default(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.supergalactic_search()
 
         assert result.Vls_Observed_ is None
@@ -154,7 +168,7 @@ class TestCaseIntegrationSuperGalactic:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_distance_10(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.supergalactic_search(distance=10)
 
         assert result.Vls_Observed_ == 730.
@@ -168,7 +182,7 @@ class TestCaseIntegrationSuperGalactic:
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
     def test_velocity_10(self):
-        cf3 = pycf3.CF3()
+        cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.supergalactic_search(velocity=10)
 
         assert result.Vls_Observed_ is None
@@ -180,3 +194,69 @@ class TestCaseIntegrationSuperGalactic:
         npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
         npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+
+
+# =============================================================================
+# CACHE TEST
+# =============================================================================
+
+class TestCaseIntegrationCache:
+
+    @pytest.fixture
+    def cache(self, tmp_path):
+        cache = dcache.Cache(directory=tmp_path)
+        yield cache
+        cache.clear
+
+    def test_cache(self, cache):
+        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cf3 = pycf3.CF3(cache=cache)
+
+        assert len(cache) == 0
+
+        with mock.patch("requests.Session.post",
+                        return_value=mresponse) as post:
+            cf3.equatorial_search()
+            cf3.equatorial_search()
+
+        post.assert_called_once()
+        assert len(cache) == 1
+
+    def test_no_cache(self):
+        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cache = pycf3.NoCache()
+        cf3 = pycf3.CF3(cache=cache)
+
+        assert len(cache) == 0
+        with mock.patch("requests.Session.post",
+                        return_value=mresponse) as post:
+            cf3.equatorial_search()
+            cf3.equatorial_search()
+
+        assert post.call_count == 2
+        assert len(cache) == 0
+
+    def test_cache_expire(self, cache):
+        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cf3 = pycf3.CF3(cache=cache, cache_expire=2)
+
+        assert len(cache) == 0
+        with mock.patch("requests.Session.post",
+                        return_value=mresponse) as post:
+            cf3.equatorial_search()
+
+            time.sleep(4)
+            cache.expire()
+
+            assert len(cache) == 0
+
+            cf3.equatorial_search()
+
+        assert post.call_count == 2
+        assert len(cache) == 1

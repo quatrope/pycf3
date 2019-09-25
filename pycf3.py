@@ -32,6 +32,7 @@ __version__ = "2019.9.25"
 # =============================================================================
 
 from collections import namedtuple
+from collections.abc import MutableMapping
 from enum import Enum
 import typing as t
 import os
@@ -82,7 +83,7 @@ DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
 # NO CACHE CLASS
 # =============================================================================
 
-class NoCache:
+class NoCache(MutableMapping):
     """Implements a no cache with the minimun methods to be useful with
     CF3 class"""
 
@@ -94,10 +95,25 @@ class NoCache:
         """This method do nothing. Always return True"""
         return True
 
+    def __len__(self):
+        return 0
+
     def __enter__(self):
         return self
 
     def __exit__(self, *exeption):
+        pass
+
+    def __delitem__(self, k):
+        raise KeyError(k)
+
+    def __getitem__(self, k):
+        raise KeyError(k)
+
+    def __iter__(self):
+        return iter({})
+
+    def __setitem__(self, k, v):
         pass
 
 
@@ -314,8 +330,8 @@ class CF3:
             base=base, args=(self.url,), kwargs=payload, typed=False)
 
         with self.cache as cache:
-            result = cache.get(key, default=dcache.core.ENOVAL, retry=True)
-            if result == dcache.core.ENOVAL:
+            response = cache.get(key, default=dcache.core.ENOVAL, retry=True)
+            if response == dcache.core.ENOVAL:
                 response = self.session.post(self.url, payload)
                 cache.set(
                     key, response, expire=self.cache_expire,
