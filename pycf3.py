@@ -79,6 +79,26 @@ PYCF3_DATA = os.path.expanduser(os.path.join('~', 'pycf3_data'))
 DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
 
 
+CITATION_INFO = """
+All data exposed by pycf3 belongs to the project
+
+Cosmicflows-3 Distance–Velocity Calculato
+(http://edd.ifa.hawaii.edu/CF3calculator/)
+Copyright (C) Cosmicflows Team
+The Extragalactic Distance Database (EDD)
+
+For citation check: https://github.com/quatrope/pycf3/blob/master/README.rst
+
+"""
+
+
+# =============================================================================
+# Recognision
+# =============================================================================
+
+print(CITATION_INFO)
+
+
 # =============================================================================
 # NO CACHE CLASS
 # =============================================================================
@@ -160,7 +180,7 @@ class Result:
         Observed velocity, :math:`V_{ls}`, vs. distance. `Vls_Observed_` is
         ``None`` if `distance` is ``None``
     Vcls_Adjusted_ : ``float`` or ``None``
-        Cosmologically	adjusted velocity, :math:`V_{ls}^c`, vs. distance.
+        Cosmologically  adjusted velocity, :math:`V_{ls}^c`, vs. distance.
         The corrected velocity :math:`V_{ls}^c` is related to the observed
         velocity :math:`V_{ls}` by:
 

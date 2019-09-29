@@ -27,3 +27,28 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+ABOUT THE DATA
+
+All data exposed by pycf3 belongs to the project
+
+Cosmicflows-3 Distance–Velocity Calculato
+(http://edd.ifa.hawaii.edu/CF3calculator/)
+Copyright (C) Cosmicflows Team
+The Extragalactic Distance Database (EDD)
+
+Please cite:
+
+Shaya, E. J., Tully, R. B., Hoffman, Y., & Pomarède, D. (2017). Action dynamics
+of the local supercluster. arXiv preprint arXiv:1710.08935.
+
+BibText:
+
+@article{shaya2017action,
+  title={Action dynamics of the local supercluster},
+  author={Shaya, Edward J and Tully, R Brent and Hoffman, Yehuda and Pomar{\`e}de, Daniel},
+  journal={arXiv preprint arXiv:1710.08935},
+  year={2017}
+}
