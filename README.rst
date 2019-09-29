@@ -61,8 +61,7 @@ Citation
 --------
 
 
-ABOUT THE DATA
-´´´´´´´´´´´´´´
+**ABOUT THE DATA**
 
 All data exposed by pycf3 belongs to the project
 
