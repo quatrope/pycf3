@@ -48,7 +48,7 @@ https://github.com/quatrope/pycf3
 License
 -------
 
-feets is under
+pycf3 is under
 `The BSD 3 <https://raw.githubusercontent.com/quatrope/pycf3/master/LICENSE>`__
 
 The BSD 3-clause license allows you almost unlimited freedom with the software so long as you include the BSD copyright and license notice in it (found in Fulltext).

@@ -82,12 +82,13 @@ DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
 CITATION_INFO = """
 All data exposed by pycf3 belongs to the project
 
-Cosmicflows-3 Distance–Velocity Calculato
+Cosmicflows-3 Distance-Velocity Calculator
 (http://edd.ifa.hawaii.edu/CF3calculator/)
 Copyright (C) Cosmicflows Team
 The Extragalactic Distance Database (EDD)
 
-For citation check: https://github.com/quatrope/pycf3/blob/master/README.rst
+For citation check:
+    https://github.com/quatrope/pycf3/blob/master/README.rst
 
 """
 
