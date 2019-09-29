@@ -66,25 +66,22 @@ ABOUT THE DATA
 
 All data exposed by pycf3 belongs to the project
 
-Cosmicflows-3 Distance–Velocity Calculato
-(http://edd.ifa.hawaii.edu/CF3calculator/)
-Copyright (C) Cosmicflows Team
-The Extragalactic Distance Database (EDD)
+    Cosmicflows-3 Distance–Velocity Calculato (http://edd.ifa.hawaii.edu/CF3calculator/)
+    Copyright (C) Cosmicflows Team - The Extragalactic Distance Database (EDD)
 
 Please cite:
 
-Shaya, E. J., Tully, R. B., Hoffman, Y., & Pomarède, D. (2017). Action dynamics
-of the local supercluster. arXiv preprint arXiv:1710.08935.
+    Shaya, E. J., Tully, R. B., Hoffman, Y., & Pomarède, D. (2017). Action dynamics
+    of the local supercluster. arXiv preprint arXiv:1710.08935.
 
-BibText:
+BibText::
 
-@article{shaya2017action,
-  title={Action dynamics of the local supercluster},
-  author={Shaya, Edward J and Tully, R Brent and Hoffman, Yehuda and Pomar{\`e}de, Daniel},
-  journal={arXiv preprint arXiv:1710.08935},
-  year={2017}
-}
-
+    @article{shaya2017action,
+    title={Action dynamics of the local supercluster},
+    author={Shaya, Edward J and Tully, R Brent and Hoffman, Yehuda and Pomar{\`e}de, Daniel},
+    journal={arXiv preprint arXiv:1710.08935},
+    year={2017}
+    }
 
 
 Authors
