@@ -56,7 +56,7 @@ The BSD 3-clause license allows you almost unlimited freedom with the software s
 Citation
 --------
 
-Please reference pycf3 in any research report or publication that requires citation of any author's work.  The minimal content of a citation should include:
+Please acknowledge pycf3 in any research report or publication that requires citation of any author's work.
 Our suggested acknowledgment is:
 
     The authors acknowledge the pycf3 project that contributed to the research reported here. <https://pycf3.readthedocs.io/>

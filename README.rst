@@ -60,8 +60,8 @@ https://pycf3.readthedocs.io
 Citation
 --------
 
-Please reference pycf3 in any research report or publication that requires citation of any author's work.  The minimal content of a citation should include:
-Our suggested acknowledgment is: 
+Please acknowledge pycf3 in any research report or publication that requires citation of any author's work.
+Our suggested acknowledgment is:
 
     The authors acknowledge the pycf3 project that contributed to the research reported here. <https://pycf3.readthedocs.io/>
 
@@ -70,7 +70,7 @@ Our suggested acknowledgment is:
 
 All data exposed by pycf3 belongs to the project
 
-    Cosmicflows-3 Distance–Velocity Calculato (http://edd.ifa.hawaii.edu/CF3calculator/)
+    Cosmicflows-3 Distance-Velocity Calculato (http://edd.ifa.hawaii.edu/CF3calculator/)
     Copyright (C) Cosmicflows Team - The Extragalactic Distance Database (EDD)
 
 Please cite:
@@ -81,10 +81,10 @@ Please cite:
 BibText::
 
     @article{shaya2017action,
-    title={Action dynamics of the local supercluster},
-    author={Shaya, Edward J and Tully, R Brent and Hoffman, Yehuda and Pomar{\`e}de, Daniel},
-    journal={arXiv preprint arXiv:1710.08935},
-    year={2017}
+        title={Action dynamics of the local supercluster},
+        author={Shaya, Edward J and Tully, R Brent and Hoffman, Yehuda and Pomar{\`e}de, Daniel},
+        journal={arXiv preprint arXiv:1710.08935},
+        year={2017}
     }
 
 
