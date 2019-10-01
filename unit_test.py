@@ -361,7 +361,7 @@ class TestCaseCache:
     def cache(self, tmp_path):
         cache = dcache.Cache(directory=tmp_path)
         yield cache
-        cache.clear
+        cache.clear()
 
     def test_cache(self, cache):
         with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
@@ -404,14 +404,10 @@ class TestCaseCache:
         assert len(cache) == 0
         with mock.patch("requests.Session.post",
                         return_value=mresponse) as post:
-            cf3.equatorial_search()
-
-            time.sleep(4)
-            cache.expire()
-
-            assert len(cache) == 0
 
             cf3.equatorial_search()
+            time.sleep(3)
+            cf3.equatorial_search(ra=1)
 
         assert post.call_count == 2
         assert len(cache) == 1

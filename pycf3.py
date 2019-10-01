@@ -117,6 +117,10 @@ class NoCache(MutableMapping):
         """This method do nothing. Always return True"""
         return True
 
+    def expire(self, now=None, retry=False):
+        """Always return 0"""
+        return 0
+
     def __len__(self):
         return 0
 
@@ -388,6 +392,7 @@ class CF3:
             base=base, args=(self.url,), kwargs=payload, typed=False)
 
         with self.cache as cache:
+            cache.expire()
             response = cache.get(key, default=dcache.core.ENOVAL, retry=True)
             if response == dcache.core.ENOVAL:
                 response = self.session.post(self.url, payload, **post_kwargs)
