@@ -25,14 +25,8 @@ Warning this code is SLOW!
 
 import random
 import time
-import pickle
-from unittest import mock
-
-import pytest
 
 from numpy import testing as npt
-
-import diskcache as dcache
 
 import pycf3
 
@@ -194,69 +188,3 @@ class TestCaseIntegrationSuperGalactic:
         npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
         npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
         npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
-
-
-# =============================================================================
-# CACHE TEST
-# =============================================================================
-
-class TestCaseIntegrationCache:
-
-    @pytest.fixture
-    def cache(self, tmp_path):
-        cache = dcache.Cache(directory=tmp_path)
-        yield cache
-        cache.clear
-
-    def test_cache(self, cache):
-        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
-            mresponse = pickle.load(fp)
-
-        cf3 = pycf3.CF3(cache=cache)
-
-        assert len(cache) == 0
-
-        with mock.patch("requests.Session.post",
-                        return_value=mresponse) as post:
-            cf3.equatorial_search()
-            cf3.equatorial_search()
-
-        post.assert_called_once()
-        assert len(cache) == 1
-
-    def test_no_cache(self):
-        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
-            mresponse = pickle.load(fp)
-
-        cache = pycf3.NoCache()
-        cf3 = pycf3.CF3(cache=cache)
-
-        assert len(cache) == 0
-        with mock.patch("requests.Session.post",
-                        return_value=mresponse) as post:
-            cf3.equatorial_search()
-            cf3.equatorial_search()
-
-        assert post.call_count == 2
-        assert len(cache) == 0
-
-    def test_cache_expire(self, cache):
-        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
-            mresponse = pickle.load(fp)
-
-        cf3 = pycf3.CF3(cache=cache, cache_expire=2)
-
-        assert len(cache) == 0
-        with mock.patch("requests.Session.post",
-                        return_value=mresponse) as post:
-            cf3.equatorial_search()
-
-            time.sleep(4)
-            cache.expire()
-
-            assert len(cache) == 0
-
-            cf3.equatorial_search()
-
-        assert post.call_count == 2
-        assert len(cache) == 1

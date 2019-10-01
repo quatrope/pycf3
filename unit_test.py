@@ -22,6 +22,9 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 
 import pickle
 from unittest import mock
+import time
+
+import diskcache as dcache
 
 from numpy import testing as npt
 
@@ -346,3 +349,69 @@ class TestCaseSuperGalactic:
         cf3 = pycf3.CF3(cache=pycf3.NoCache())
         with pytest.raises(TypeError):
             cf3.supergalactic_search(distance="foo")
+
+
+# =============================================================================
+# CACHE TEST
+# =============================================================================
+
+class TestCaseCache:
+
+    @pytest.fixture
+    def cache(self, tmp_path):
+        cache = dcache.Cache(directory=tmp_path)
+        yield cache
+        cache.clear
+
+    def test_cache(self, cache):
+        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cf3 = pycf3.CF3(cache=cache)
+
+        assert len(cache) == 0
+
+        with mock.patch("requests.Session.post",
+                        return_value=mresponse) as post:
+            cf3.equatorial_search()
+            cf3.equatorial_search()
+
+        post.assert_called_once()
+        assert len(cache) == 1
+
+    def test_no_cache(self):
+        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cache = pycf3.NoCache()
+        cf3 = pycf3.CF3(cache=cache)
+
+        assert len(cache) == 0
+        with mock.patch("requests.Session.post",
+                        return_value=mresponse) as post:
+            cf3.equatorial_search()
+            cf3.equatorial_search()
+
+        assert post.call_count == 2
+        assert len(cache) == 0
+
+    def test_cache_expire(self, cache):
+        with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
+            mresponse = pickle.load(fp)
+
+        cf3 = pycf3.CF3(cache=cache, cache_expire=2)
+
+        assert len(cache) == 0
+        with mock.patch("requests.Session.post",
+                        return_value=mresponse) as post:
+            cf3.equatorial_search()
+
+            time.sleep(4)
+            cache.expire()
+
+            assert len(cache) == 0
+
+            cf3.equatorial_search()
+
+        assert post.call_count == 2
+        assert len(cache) == 1

@@ -44,6 +44,7 @@ import diskcache as dcache
 import pyquery as pq
 
 import requests
+from requests.packages.urllib3.util.retry import Retry
 
 
 # =============================================================================
@@ -94,7 +95,7 @@ For citation check:
 
 
 # =============================================================================
-# Recognision
+# Recognition
 # =============================================================================
 
 print(CITATION_INFO)
@@ -105,7 +106,7 @@ print(CITATION_INFO)
 # =============================================================================
 
 class NoCache(MutableMapping):
-    """Implements a no cache with the minimun methods to be useful with
+    """Implements a no cache with the minimun methods to be used with
     CF3 class"""
 
     def get(self, key, default=None, *args, **kwargs):
@@ -136,6 +137,40 @@ class NoCache(MutableMapping):
 
     def __setitem__(self, k, v):
         pass
+
+
+# =============================================================================
+# SESSION OBJECT
+# =============================================================================
+
+class RetrySession(requests.Session):
+    """Session with retry.
+
+    Parameters
+    ----------
+
+    retries: ``int`` (default=``3``)
+        Total number of retries to allow.
+        It's a good idea to set this to some sensibly-high value to
+        account for unexpected edge cases and avoid infinite retry loops.
+        Set to ``0`` to fail on the first retry.
+
+    """
+    def __init__(self, retries=3, backoff_factor=0.3,
+                 status_forcelist=(500, 502, 504),
+                 **session_options):
+        super().__init__(**session_options)
+        retries = retries or 0
+
+        retry = Retry(
+            total=retries,
+            read=retries,
+            connect=retries,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist)
+        adapter = requests.adapters.HTTPAdapter(max_retries=retry)
+        self.mount('http://', adapter)
+        self.mount('https://', adapter)
 
 
 # =============================================================================
@@ -267,9 +302,11 @@ class CF3:
 
     url : ``str`` (default: ``pycf3.URL``)
         The endpoint of the cosmic flow calculator.
-    session : ``request.Session`` (default: ``None``)
-        The session to use to send the requests. By default a session without
-        any configuration is created. More info: https://2.python-requests.org
+    session : ``pycf3.Session`` (default: ``None``)
+        The session to use to send the requests. By default a
+        ``pyc3.RetrySession`` with 3 retry is created. More info:
+        https://2.python-requests.org,
+        https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html.
     cache : ``diskcache.Cache``, ``diskcache.Fanout``,
             ``pycf3.NoCache`` or ``None`` (default: ``None``)
         Any instance of ``diskcache.Cache``, ``diskcache.Fanout`` or
@@ -287,7 +324,7 @@ class CF3:
     # =========================================================================
 
     url: str = attr.ib(default=URL, repr=True)
-    session: requests.Session = attr.ib(factory=requests.Session, repr=False)
+    session: requests.Session = attr.ib(factory=RetrySession, repr=False)
     cache: t.Union[dcache.Cache, dcache.FanoutCache] = attr.ib()
     cache_expire: float = attr.ib(default=None, repr=False)
 
@@ -300,7 +337,7 @@ class CF3:
     # =========================================================================
 
     def _search(self, coordinate_system, alpha, delta, cone,
-                distance=None, velocity=None):
+                distance=None, velocity=None, **post_kwargs):
 
         # The validations
         if coordinate_system not in CoordinateSystem:
@@ -353,7 +390,7 @@ class CF3:
         with self.cache as cache:
             response = cache.get(key, default=dcache.core.ENOVAL, retry=True)
             if response == dcache.core.ENOVAL:
-                response = self.session.post(self.url, payload)
+                response = self.session.post(self.url, payload, **post_kwargs)
                 cache.set(
                     key, response, expire=self.cache_expire,
                     tag="@".join(key[:2]), retry=True)
@@ -372,7 +409,7 @@ class CF3:
     # =========================================================================
 
     def equatorial_search(self, ra=187.78917, dec=13.33386, cone=10.0,
-                          distance=None, velocity=None):
+                          distance=None, velocity=None, **post_kwargs):
         """Search around the sky position expressed in equatorial coordinates
         (J2000 as 360° decimal) in degrees.
 
@@ -389,6 +426,8 @@ class CF3:
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model distance(s) in Mpc - potentially more than one value.
+        post_kwargs:
+            Optional arguments that ``request.post`` takes.
 
         Returns
         -------
@@ -400,11 +439,11 @@ class CF3:
         """
         response = self._search(
             CoordinateSystem.equatorial, alpha=ra, delta=dec, cone=cone,
-            distance=distance, velocity=velocity)
+            distance=distance, velocity=velocity, **post_kwargs)
         return response
 
     def galactic_search(self, glon=282.96547, glat=75.41360, cone=10.0,
-                        distance=None, velocity=None):
+                        distance=None, velocity=None, **post_kwargs):
         """Search around the sky position expressed in galactic coordinates
         (J2000 as 360° decimal) in degrees.
 
@@ -421,6 +460,8 @@ class CF3:
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model distance(s) in Mpc - potentially more than one value.
+        post_kwargs:
+            Optional arguments that ``request.post`` takes.
 
         Returns
         -------
@@ -432,11 +473,11 @@ class CF3:
         """
         response = self._search(
             CoordinateSystem.galactic, alpha=glon, delta=glat, cone=cone,
-            distance=distance, velocity=velocity)
+            distance=distance, velocity=velocity, **post_kwargs)
         return response
 
     def supergalactic_search(self, sgl=102.0, sgb=-2.0, cone=10.0,
-                             distance=None, velocity=None):
+                             distance=None, velocity=None, **post_kwargs):
         """Search around the sky position expressed in super-galactic
         coordinates (J2000 as 360° decimal) in degrees.
 
@@ -453,6 +494,8 @@ class CF3:
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model distance(s) in Mpc - potentially more than one value.
+        post_kwargs:
+            Optional arguments that ``request.post`` takes.
 
         Returns
         -------
@@ -464,5 +507,5 @@ class CF3:
         """
         response = self._search(
             CoordinateSystem.supergalactic, alpha=sgl, delta=sgb, cone=cone,
-            distance=distance, velocity=velocity)
+            distance=distance, velocity=velocity, **post_kwargs)
         return response
