@@ -22,9 +22,9 @@ More information: http://edd.ifa.hawaii.edu/CF3calculator/
 """
 
 
-__all__ = ["CF3", "Result", "NoCache"]
+__all__ = ["CF3", "Result", "NoCache", "RetrySession"]
 
-__version__ = "2019.9.25"
+__version__ = "2019.10"
 
 
 # =============================================================================
@@ -153,11 +153,30 @@ class RetrySession(requests.Session):
     Parameters
     ----------
 
-    retries: ``int`` (default=``3``)
+    retries: ``int`` (default: ``3``)
         Total number of retries to allow.
         It's a good idea to set this to some sensibly-high value to
         account for unexpected edge cases and avoid infinite retry loops.
         Set to ``0`` to fail on the first retry.
+    backoff_factor: ``float`` (default: ``0.3``)
+        A backoff factor to apply between attempts after the second try (most
+        errors are resolved immediately by a second try without a delay).
+        urllib3 will sleep for:
+
+            ``{backoff factor} * (2 ** ({number of total retries} - 1))``
+
+        seconds. If the backoff_factor is ``0.1``, then ``sleep()`` will
+        sleep for ``[0.0s, 0.2s, 0.4s, ...]`` between retries. It will never be
+        longer than ``urllib3.Retry.BACKOFF_MAX``.
+
+    status_forcelist: iterable (default: ``(500, 502, 504``)
+
+        A set of integer HTTP status codes that we should force a retry on. A
+        retry is initiated if the request method is in method_whitelist and the
+        response status code is in status_forcelist.
+
+        By default, this is ``(500, 502, 504``.
+
 
     """
     def __init__(self, retries=3, backoff_factor=0.3,
@@ -166,15 +185,17 @@ class RetrySession(requests.Session):
         super().__init__(**session_options)
         retries = retries or 0
 
-        retry = Retry(
+        self.retry_ = Retry(
             total=retries,
             read=retries,
             connect=retries,
             backoff_factor=backoff_factor,
             status_forcelist=status_forcelist)
-        adapter = requests.adapters.HTTPAdapter(max_retries=retry)
-        self.mount('http://', adapter)
-        self.mount('https://', adapter)
+        self.adapter_ = requests.adapters.HTTPAdapter(max_retries=self.retry_)
+        self.mount('http://', self.adapter_)
+        self.mount('https://', self.adapter_)
+
+        self.total_backoff_ = float(backoff_factor) * (2 ** (retries - 1))
 
 
 # =============================================================================
@@ -396,6 +417,7 @@ class CF3:
             response = cache.get(key, default=dcache.core.ENOVAL, retry=True)
             if response == dcache.core.ENOVAL:
                 response = self.session.post(self.url, payload, **post_kwargs)
+                response.raise_for_status()
                 cache.set(
                     key, response, expire=self.cache_expire,
                     tag="@".join(key[:2]), retry=True)
