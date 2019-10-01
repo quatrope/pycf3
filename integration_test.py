@@ -36,14 +36,21 @@ import pycf3
 
 
 # =============================================================================
-# EQUATORIAL TESTCASE
+# SLEEP BASE
 # =============================================================================
 
-class TestCaseIntegrationEquatorial:
+class SleepBase:
 
     def teardown_method(self, method):
         s = random.randint(0, 1) + random.random()
         time.sleep(s)
+
+
+# =============================================================================
+# EQUATORIAL TESTCASE
+# =============================================================================
+
+class TestCaseIntegrationEquatorial(SleepBase):
 
     def test_default(self):
         cf3 = pycf3.CF3(cache=pycf3.NoCache())
@@ -92,7 +99,7 @@ class TestCaseIntegrationEquatorial:
 # GALACTIC TEST CASE
 # =============================================================================
 
-class TestCaseIntegrationGalactic:
+class TestCaseIntegrationGalactic(SleepBase):
 
     def teardown_method(self, method):
         s = random.randint(0, 1) + random.random()
@@ -145,7 +152,7 @@ class TestCaseIntegrationGalactic:
 # SUPER-GALACTIC TEST CASE
 # =============================================================================
 
-class TestCaseIntegrationSuperGalactic:
+class TestCaseIntegrationSuperGalactic(SleepBase):
 
     def teardown_method(self, method):
         s = random.randint(0, 1) + random.random()
@@ -198,13 +205,13 @@ class TestCaseIntegrationSuperGalactic:
 # CACHE TEST
 # =============================================================================
 
-class TestCaseIntegrationCache:
+class TestCaseIntegrationCache(SleepBase):
 
     @pytest.fixture
     def cache(self, tmp_path):
         cache = dcache.Cache(directory=tmp_path)
         yield cache
-        cache.clear
+        cache.clear()
 
     def test_cache(self, cache):
         cf3 = pycf3.CF3(cache=cache)
