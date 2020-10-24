@@ -21,24 +21,24 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 # =============================================================================
 
 import pickle
-from unittest import mock
 import time
+from unittest import mock
 
 import diskcache as dcache
 
 from numpy import testing as npt
 
-import pytest
-
 import pycf3
+
+import pytest
 
 
 # =============================================================================
 # EQUATORIAL TESTCASE
 # =============================================================================
 
-class TestCaseEquatorial:
 
+class TestCaseEquatorial:
     def test_default(self):
         with open("mock_data/tcEquatorial_default.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -65,8 +65,8 @@ class TestCaseEquatorial:
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.equatorial_search(distance=10)
 
-        assert result.Vls_Observed_ == 730.
-        assert result.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.0
+        assert result.Vcls_Adjusted_ == 691.0
 
         npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
         npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
@@ -143,8 +143,8 @@ class TestCaseEquatorial:
 # GALACTIC TEST CASE
 # =============================================================================
 
-class TestCaseGalactic:
 
+class TestCaseGalactic:
     def test_default(self):
         with open("mock_data/tcGalactic_default.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -171,8 +171,8 @@ class TestCaseGalactic:
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.galactic_search(distance=10)
 
-        assert result.Vls_Observed_ == 730.
-        assert result.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.0
+        assert result.Vcls_Adjusted_ == 691.0
 
         npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
         npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
@@ -249,8 +249,8 @@ class TestCaseGalactic:
 # SUPER-GALACTIC TEST CASE
 # =============================================================================
 
-class TestCaseSuperGalactic:
 
+class TestCaseSuperGalactic:
     def test_default(self):
         with open("mock_data/tcSuperGalactic_default.pkl", "rb") as fp:
             mresponse = pickle.load(fp)
@@ -277,8 +277,8 @@ class TestCaseSuperGalactic:
         with mock.patch("requests.Session.post", return_value=mresponse):
             result = cf3.supergalactic_search(distance=10)
 
-        assert result.Vls_Observed_ == 730.
-        assert result.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.0
+        assert result.Vcls_Adjusted_ == 691.0
 
         npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
         npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
@@ -355,8 +355,8 @@ class TestCaseSuperGalactic:
 # CACHE TEST
 # =============================================================================
 
-class TestCaseCache:
 
+class TestCaseCache:
     @pytest.fixture
     def cache(self, tmp_path):
         cache = dcache.Cache(directory=tmp_path)
@@ -371,8 +371,9 @@ class TestCaseCache:
 
         assert len(cache) == 0
 
-        with mock.patch("requests.Session.post",
-                        return_value=mresponse) as post:
+        with mock.patch(
+            "requests.Session.post", return_value=mresponse
+        ) as post:
             cf3.equatorial_search()
             cf3.equatorial_search()
 
@@ -387,8 +388,9 @@ class TestCaseCache:
         cf3 = pycf3.CF3(cache=cache)
 
         assert len(cache) == 0
-        with mock.patch("requests.Session.post",
-                        return_value=mresponse) as post:
+        with mock.patch(
+            "requests.Session.post", return_value=mresponse
+        ) as post:
             cf3.equatorial_search()
             cf3.equatorial_search()
 
@@ -402,8 +404,9 @@ class TestCaseCache:
         cf3 = pycf3.CF3(cache=cache, cache_expire=2)
 
         assert len(cache) == 0
-        with mock.patch("requests.Session.post",
-                        return_value=mresponse) as post:
+        with mock.patch(
+            "requests.Session.post", return_value=mresponse
+        ) as post:
 
             cf3.equatorial_search()
             time.sleep(3)

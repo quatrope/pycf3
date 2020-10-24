@@ -26,23 +26,22 @@ Warning this code is SLOW!
 import random
 import time
 
-import pytest
-
-import requests
+import diskcache as dcache
 
 from numpy import testing as npt
 
-import diskcache as dcache
-
 import pycf3
 
+import pytest
+
+import requests
 
 # =============================================================================
 # SLEEP BASE
 # =============================================================================
 
-class SleepBase:
 
+class SleepBase:
     def teardown_method(self, method):
         s = random.randint(0, 1) + random.random()
         time.sleep(s)
@@ -52,8 +51,8 @@ class SleepBase:
 # EQUATORIAL TESTCASE
 # =============================================================================
 
-class TestCaseIntegrationEquatorial(SleepBase):
 
+class TestCaseIntegrationEquatorial(SleepBase):
     def test_default(self):
         cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.equatorial_search()
@@ -72,8 +71,8 @@ class TestCaseIntegrationEquatorial(SleepBase):
         cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.equatorial_search(distance=10)
 
-        assert result.Vls_Observed_ == 730.
-        assert result.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.0
+        assert result.Vcls_Adjusted_ == 691.0
 
         npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
         npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
@@ -101,8 +100,8 @@ class TestCaseIntegrationEquatorial(SleepBase):
 # GALACTIC TEST CASE
 # =============================================================================
 
-class TestCaseIntegrationGalactic(SleepBase):
 
+class TestCaseIntegrationGalactic(SleepBase):
     def teardown_method(self, method):
         s = random.randint(0, 1) + random.random()
         time.sleep(s)
@@ -125,8 +124,8 @@ class TestCaseIntegrationGalactic(SleepBase):
         cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.galactic_search(distance=10)
 
-        assert result.Vls_Observed_ == 730.
-        assert result.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.0
+        assert result.Vcls_Adjusted_ == 691.0
 
         npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
         npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
@@ -154,8 +153,8 @@ class TestCaseIntegrationGalactic(SleepBase):
 # SUPER-GALACTIC TEST CASE
 # =============================================================================
 
-class TestCaseIntegrationSuperGalactic(SleepBase):
 
+class TestCaseIntegrationSuperGalactic(SleepBase):
     def teardown_method(self, method):
         s = random.randint(0, 1) + random.random()
         time.sleep(s)
@@ -178,8 +177,8 @@ class TestCaseIntegrationSuperGalactic(SleepBase):
         cf3 = pycf3.CF3(cache=pycf3.NoCache())
         result = cf3.supergalactic_search(distance=10)
 
-        assert result.Vls_Observed_ == 730.
-        assert result.Vcls_Adjusted_ == 691.
+        assert result.Vls_Observed_ == 730.0
+        assert result.Vcls_Adjusted_ == 691.0
 
         npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
         npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
@@ -207,8 +206,8 @@ class TestCaseIntegrationSuperGalactic(SleepBase):
 # CACHE TEST
 # =============================================================================
 
-class TestCaseIntegrationCache(SleepBase):
 
+class TestCaseIntegrationCache(SleepBase):
     @pytest.fixture
     def cache(self, tmp_path):
         cache = dcache.Cache(directory=tmp_path)
@@ -252,8 +251,8 @@ class TestCaseIntegrationCache(SleepBase):
 # RETRY
 # =============================================================================
 
-class Clock:
 
+class Clock:
     def __enter__(self):
         self._t0 = time.time()
         return self
@@ -264,7 +263,6 @@ class Clock:
 
 
 class TestCaseIntegrationRetry(SleepBase):
-
     @pytest.fixture
     def cache(self, tmp_path):
         cache = pycf3.NoCache()

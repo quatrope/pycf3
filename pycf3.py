@@ -24,18 +24,18 @@ More information: http://edd.ifa.hawaii.edu/CF3calculator/
 
 __all__ = ["CF3", "Result", "NoCache", "RetrySession"]
 
-__version__ = "2019.10"
+__version__ = "2020.11b"
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+import os
+import typing as t
 from collections import namedtuple
 from collections.abc import MutableMapping
 from enum import Enum
-import typing as t
-import os
 
 import attr
 
@@ -46,10 +46,10 @@ import pyquery as pq
 import requests
 from requests.packages.urllib3.util.retry import Retry
 
-
 # =============================================================================
 # CONSTANTS
 # =============================================================================
+
 
 class CoordinateSystem(Enum):
     equatorial = "equatorial"
@@ -60,21 +60,21 @@ class CoordinateSystem(Enum):
 ALPHA = {
     CoordinateSystem.equatorial: "ra",
     CoordinateSystem.galactic: "glon",
-    CoordinateSystem.supergalactic: "sgl"
+    CoordinateSystem.supergalactic: "sgl",
 }
 
 
 DELTA = {
     CoordinateSystem.equatorial: "dec",
     CoordinateSystem.galactic: "glat",
-    CoordinateSystem.supergalactic: "sgb"
+    CoordinateSystem.supergalactic: "sgb",
 }
 
 
 URL = "http://edd.ifa.hawaii.edu/CF3calculator/getData.php"
 
 
-PYCF3_DATA = os.path.expanduser(os.path.join('~', 'pycf3_data'))
+PYCF3_DATA = os.path.expanduser(os.path.join("~", "pycf3_data"))
 
 
 DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
@@ -104,6 +104,7 @@ print(CITATION_INFO)
 # =============================================================================
 # NO CACHE CLASS
 # =============================================================================
+
 
 class NoCache(MutableMapping):
     """Implements a no cache with the minimun methods to be used with
@@ -147,6 +148,7 @@ class NoCache(MutableMapping):
 # SESSION OBJECT
 # =============================================================================
 
+
 class RetrySession(requests.Session):
     """Session with retry.
 
@@ -179,9 +181,14 @@ class RetrySession(requests.Session):
 
 
     """
-    def __init__(self, retries=3, backoff_factor=0.3,
-                 status_forcelist=(500, 502, 504),
-                 **session_options):
+
+    def __init__(
+        self,
+        retries=3,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 504),
+        **session_options,
+    ):
         super().__init__(**session_options)
         retries = retries or 0
 
@@ -190,10 +197,11 @@ class RetrySession(requests.Session):
             read=retries,
             connect=retries,
             backoff_factor=backoff_factor,
-            status_forcelist=status_forcelist)
+            status_forcelist=status_forcelist,
+        )
         self.adapter_ = requests.adapters.HTTPAdapter(max_retries=self.retry_)
-        self.mount('http://', self.adapter_)
-        self.mount('https://', self.adapter_)
+        self.mount("http://", self.adapter_)
+        self.mount("https://", self.adapter_)
 
         self.total_backoff_ = float(backoff_factor) * (2 ** (retries - 1))
 
@@ -202,7 +210,7 @@ class RetrySession(requests.Session):
 # RESPONSE OBJECT
 # =============================================================================
 
-SearchAt = namedtuple("SearchAt", ['ra', 'dec', 'glon', 'glat', 'sgl', 'sgb'])
+SearchAt = namedtuple("SearchAt", ["ra", "dec", "glon", "glat", "sgl", "sgb"])
 
 
 @attr.s(cmp=False, hash=False, frozen=True)
@@ -300,22 +308,25 @@ class Result:
     def _Vls_Observed__default(self):
         if self.distance is None:
             return None
-        vlso_table = self.d_(
-            "span:contains(' - Observed')").parents("table#calc")
+        vlso_table = self.d_("span:contains(' - Observed')").parents(
+            "table#calc"
+        )
         return float(vlso_table.find("td#calc")[1].text)
 
     @Vcls_Adjusted_.default
     def _Vcls_Adjusted__default(self):
         if self.distance is None:
             return None
-        vclso_table = self.d_(
-            "span:contains(' - Adjusted')").parents("table#calc")
+        vclso_table = self.d_("span:contains(' - Adjusted')").parents(
+            "table#calc"
+        )
         return float(vclso_table.find("td#calc")[1].text)
 
 
 # =============================================================================
 # CLIENT
 # =============================================================================
+
 
 @attr.s(cmp=False, hash=False, frozen=True)
 class CF3:
@@ -361,14 +372,23 @@ class CF3:
     # INTERNAL
     # =========================================================================
 
-    def _search(self, coordinate_system, alpha, delta, cone,
-                distance=None, velocity=None, **post_kwargs):
+    def _search(
+        self,
+        coordinate_system,
+        alpha,
+        delta,
+        cone,
+        distance=None,
+        velocity=None,
+        **post_kwargs,
+    ):
 
         # The validations
         if coordinate_system not in CoordinateSystem:
             raise TypeError(
                 "coordinate_system must be a member of "
-                "pycf3.CoordinateSystem enum")
+                "pycf3.CoordinateSystem enum"
+            )
 
         if not isinstance(alpha, (int, float)):
             raise TypeError(f"{ALPHA[coordinate_system]} must be int or float")
@@ -377,16 +397,18 @@ class CF3:
             raise TypeError(f"{DELTA[coordinate_system]} must be int or float")
         elif not (-90 <= delta <= 90):
             raise ValueError(
-                f"{DELTA[coordinate_system]} must be >= -90 and <= 90")
+                f"{DELTA[coordinate_system]} must be >= -90 and <= 90"
+            )
 
         if not isinstance(cone, (int, float)):
-            raise TypeError(f"cone must be int or float")
+            raise TypeError("Cone must be int or float")
         elif cone < 0:
             raise ValueError("Cone must be positive")
 
         if distance is not None and velocity is not None:
             raise ValueError(
-                "You cant provide velocity and distance at the same time")
+                "You cant provide velocity and distance at the same time"
+            )
         elif distance is not None:
             if not isinstance(distance, (int, float)):
                 raise TypeError("distance must be int, float or None")
@@ -405,12 +427,14 @@ class CF3:
             "cone": cone,
             "dist_t": "" if distance is None else distance,
             "vel_t": "" if velocity is None else velocity,
-            "veldist": veldist}
+            "veldist": veldist,
+        }
 
         # start the cache orchestration
         base = (coordinate_system.value,)
         key = dcache.core.args_to_key(
-            base=base, args=(self.url,), kwargs=payload, typed=False)
+            base=base, args=(self.url,), kwargs=payload, typed=False
+        )
 
         with self.cache as cache:
             cache.expire()
@@ -419,15 +443,25 @@ class CF3:
                 response = self.session.post(self.url, payload, **post_kwargs)
                 response.raise_for_status()
                 cache.set(
-                    key, response, expire=self.cache_expire,
-                    tag="@".join(key[:2]), retry=True)
+                    key,
+                    response,
+                    expire=self.cache_expire,
+                    tag="@".join(key[:2]),
+                    retry=True,
+                )
 
         parsed_response = pq.PyQuery(response.text)
 
         result = Result(
-            coordinate=coordinate_system, alpha=alpha, delta=delta, cone=cone,
-            distance=distance, velocity=velocity,
-            response_=response, d_=parsed_response)
+            coordinate=coordinate_system,
+            alpha=alpha,
+            delta=delta,
+            cone=cone,
+            distance=distance,
+            velocity=velocity,
+            response_=response,
+            d_=parsed_response,
+        )
 
         return result
 
@@ -435,8 +469,15 @@ class CF3:
     # PUBLIC API
     # =========================================================================
 
-    def equatorial_search(self, ra=187.78917, dec=13.33386, cone=10.0,
-                          distance=None, velocity=None, **post_kwargs):
+    def equatorial_search(
+        self,
+        ra=187.78917,
+        dec=13.33386,
+        cone=10.0,
+        distance=None,
+        velocity=None,
+        **post_kwargs,
+    ):
         """Search around the sky position expressed in equatorial coordinates
         (J2000 as 360° decimal) in degrees.
 
@@ -465,12 +506,25 @@ class CF3:
 
         """
         response = self._search(
-            CoordinateSystem.equatorial, alpha=ra, delta=dec, cone=cone,
-            distance=distance, velocity=velocity, **post_kwargs)
+            CoordinateSystem.equatorial,
+            alpha=ra,
+            delta=dec,
+            cone=cone,
+            distance=distance,
+            velocity=velocity,
+            **post_kwargs,
+        )
         return response
 
-    def galactic_search(self, glon=282.96547, glat=75.41360, cone=10.0,
-                        distance=None, velocity=None, **post_kwargs):
+    def galactic_search(
+        self,
+        glon=282.96547,
+        glat=75.41360,
+        cone=10.0,
+        distance=None,
+        velocity=None,
+        **post_kwargs,
+    ):
         """Search around the sky position expressed in galactic coordinates
         (J2000 as 360° decimal) in degrees.
 
@@ -499,12 +553,25 @@ class CF3:
 
         """
         response = self._search(
-            CoordinateSystem.galactic, alpha=glon, delta=glat, cone=cone,
-            distance=distance, velocity=velocity, **post_kwargs)
+            CoordinateSystem.galactic,
+            alpha=glon,
+            delta=glat,
+            cone=cone,
+            distance=distance,
+            velocity=velocity,
+            **post_kwargs,
+        )
         return response
 
-    def supergalactic_search(self, sgl=102.0, sgb=-2.0, cone=10.0,
-                             distance=None, velocity=None, **post_kwargs):
+    def supergalactic_search(
+        self,
+        sgl=102.0,
+        sgb=-2.0,
+        cone=10.0,
+        distance=None,
+        velocity=None,
+        **post_kwargs,
+    ):
         """Search around the sky position expressed in super-galactic
         coordinates (J2000 as 360° decimal) in degrees.
 
@@ -533,6 +600,12 @@ class CF3:
 
         """
         response = self._search(
-            CoordinateSystem.supergalactic, alpha=sgl, delta=sgb, cone=cone,
-            distance=distance, velocity=velocity, **post_kwargs)
+            CoordinateSystem.supergalactic,
+            alpha=sgl,
+            delta=sgb,
+            cone=cone,
+            distance=distance,
+            velocity=velocity,
+            **post_kwargs,
+        )
         return response
