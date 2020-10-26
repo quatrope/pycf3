@@ -66,12 +66,14 @@ Clone this repo and install with pip
 Quick Usage
 -----------
 
-    import pycf3
-    cf3 = pycf3.CF3()
-    cf3.supergalactic_search(sgl=102.0, sgb=-2.0, cone=10.0, distance=None, velocity=None)
-    result = cf3.supergalactic_search(distance=10)
-    print(result.Vls_Observed_)
-    print(result.Vls_Observed_)
+    .. code-block:: python
+
+        import pycf3
+        cf3 = pycf3.CF3()
+        cf3.supergalactic_search(sgl=102.0, sgb=-2.0, cone=10.0, distance=None, velocity=None)
+        result = cf3.supergalactic_search(distance=10)
+        print(result.Vls_Observed_)
+        print(result.Vls_Observed_)
 
 For more information, read the `tutorial in the documentation <https://pycf3.readthedocs.io>`_.
 
