@@ -22,14 +22,25 @@ pycf3 - Cosmicflows-3 Distance-Velocity Calculator client for Python
    :alt: License
 
 
-Python client for Cosmicflows-3 Distance-Velocity Calculator at distances less
-than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
+pycf3 is a Python client for the Cosmicflows-3 Distance-Velocity Calculator
+best suited for distances closer than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 
-Compute expectation distances or velocities based on smoothed velocity field
+Galaxy velocities deviate from Hubble-Lemaitre expansion.
+Deviations can be considerable, as evidenced by the motion of the Local Group
+of 631 km s−1 with respect to the rest frame of the cosmic microwave background.
+
+The Cosmicflows-3 Distance-Velocity Calculator delivers a better approximation
+between observed velocities and physical distances than provided by the simple
+assumption of uniform cosmic expansion.
+
+It computes expectation distances or velocities based on a velocity field
+responding to the full complexity of structure on scales 1 − 200 Mpc, smoothed
 from the Wiener filter model of
-`Graziani et al. 2019 <https://ui.adsabs.harvard.edu/abs/2019MNRAS.488.5438G/abstract>`_
+`Graziani et al. 2019 <https://ui.adsabs.harvard.edu/abs/2019MNRAS.488.5438G/abstract>`_.
 
-More information: http://edd.ifa.hawaii.edu/CF3calculator/
+For more information, please visit the `Extragalactic Distance Database website <http://edd.ifa.hawaii.edu/CF3calculator>`_
+and read the relevant publication
+`Cosmicflows-3: Two Distance-Velocity Calculators <https://ui.adsabs.harvard.edu/abs/2020AJ....159...67K/abstract>`_.
 
 
 Help & discussion mailing list

@@ -1,5 +1,5 @@
-pycf3 - Cosmicflows-3 Distance-Velocity Calculator client for Python
-====================================================================
+pycf3 - Cosmicflows-3 Galaxy Distance-Velocity Calculator client for Python
+===========================================================================
 
 .. image:: https://travis-ci.org/quatrope/pycf3.svg?branch=master
     :target: https://travis-ci.org/quatrope/pycf3
@@ -21,14 +21,25 @@ pycf3 - Cosmicflows-3 Distance-Velocity Calculator client for Python
 Description
 -----------
 
-Python client for Cosmicflows-3 Distance-Velocity Calculator at distances less
-than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
+pycf3 is a Python client for the Cosmicflows-3 Distance-Velocity Calculator
+best suited for distances closer than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 
-Compute expectation distances or velocities based on smoothed velocity field
+Galaxy velocities deviate from Hubble-Lemaitre expansion.
+Deviations can be considerable, as evidenced by the motion of the Local Group
+of 631 km s−1 with respect to the rest frame of the cosmic microwave background.
+
+The Cosmicflows-3 Distance-Velocity Calculator delivers a better approximation
+between observed velocities and physical distances than provided by the simple
+assumption of uniform cosmic expansion.
+
+It computes expectation distances or velocities based on a velocity field
+responding to the full complexity of structure on scales 1 − 200 Mpc, smoothed
 from the Wiener filter model of
 `Graziani et al. 2019 <https://ui.adsabs.harvard.edu/abs/2019MNRAS.488.5438G/abstract>`_.
 
-More information: http://edd.ifa.hawaii.edu/CF3calculator/
+For more information, please visit the `Extragalactic Distance Database website <http://edd.ifa.hawaii.edu/CF3calculator>`_
+and read the relevant publication
+`Cosmicflows-3: Two Distance-Velocity Calculators <https://ui.adsabs.harvard.edu/abs/2020AJ....159...67K/abstract>`_.
 
 
 Basic Install
@@ -44,17 +55,27 @@ Execute
 Development Install
 --------------------
 
-1.  Clone this repo and then inside the local
-2.  Execute
+Clone this repo and install with pip
 
     .. code-block:: bash
 
+        $ git clone https://github.com/quatrope/pycf3.git
+        $ cd pycf3
         $ pip install -e .
 
-Tutorial
---------
+Quick Usage
+-----------
 
-https://pycf3.readthedocs.io
+    .. code-block:: python
+
+        import pycf3
+        cf3 = pycf3.CF3()
+        cf3.supergalactic_search(sgl=102.0, sgb=-2.0, cone=10.0, distance=None, velocity=None)
+        result = cf3.supergalactic_search(distance=10)
+        print(result.Vls_Observed_)
+        print(result.Vls_Observed_)
+
+For more information, read the `tutorial in the documentation <https://pycf3.readthedocs.io>`_.
 
 
 Citation
@@ -70,7 +91,7 @@ Our suggested acknowledgment is:
 
 All data exposed by pycf3 belongs to the project
 
-    Cosmicflows-3 Distance-Velocity Calculato (http://edd.ifa.hawaii.edu/CF3calculator/)
+    Cosmicflows-3 Distance-Velocity Calculator (http://edd.ifa.hawaii.edu/CF3calculator/)
     Copyright (C) Cosmicflows Team - The Extragalactic Distance Database (EDD)
 
 Please cite:
