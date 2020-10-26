@@ -26,7 +26,7 @@ best suited for distances closer than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calc
 
 Galaxy velocities deviate from Hubble-Lemaitre expansion.
 Deviations can be considerable, as evidenced by the motion of the Local Group
-of 631 km s−1 with respect to the rest frame of the cosmic microwave background.
+of 631 km/s with respect to the rest frame of the cosmic microwave background.
 
 The Cosmicflows-3 Distance-Velocity Calculator delivers a better approximation
 between observed velocities and physical distances than provided by the simple
@@ -57,23 +57,23 @@ Development Install
 
 Clone this repo and install with pip
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        $ git clone https://github.com/quatrope/pycf3.git
-        $ cd pycf3
-        $ pip install -e .
+    $ git clone https://github.com/quatrope/pycf3.git
+    $ cd pycf3
+    $ pip install -e .
 
 Quick Usage
 -----------
 
-    .. code-block:: python
+.. code-block:: python
 
-        import pycf3
-        cf3 = pycf3.CF3()
-        cf3.supergalactic_search(sgl=102.0, sgb=-2.0, cone=10.0, distance=None, velocity=None)
-        result = cf3.supergalactic_search(distance=10)
-        print(result.Vls_Observed_)
-        print(result.Vls_Observed_)
+    import pycf3
+    cf3 = pycf3.CF3()
+    cf3.supergalactic_search(sgl=102.0, sgb=-2.0, cone=10.0, distance=None, velocity=None)
+    result = cf3.supergalactic_search(distance=10)
+    print(result.Vls_Observed_)
+    print(result.Vls_Observed_)
 
 For more information, read the `tutorial in the documentation <https://pycf3.readthedocs.io>`_.
 
