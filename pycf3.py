@@ -41,7 +41,6 @@ __version__ = "2020.11b"
 # IMPORTS
 # =============================================================================
 
-import copy
 import os
 import typing as t
 from collections import namedtuple
@@ -52,13 +51,14 @@ import attr
 
 import diskcache as dcache
 
+import numpy as np
+
 import requests
 from requests.packages.urllib3.util.retry import Retry
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
-
 
 class CoordinateSystem(Enum):
     equatorial = "equatorial"
@@ -203,7 +203,7 @@ class RetrySession(requests.Session):
 SearchAt = namedtuple("SearchAt", ["ra", "dec", "glon", "glat", "sgl", "sgb"])
 
 
-@attr.s(cmp=False, hash=False, frozen=True)
+@attr.s(eq=False, order=False, frozen=True)
 class Result:
     r"""Parsed result -
 
@@ -220,8 +220,6 @@ class Result:
         :math:`\alpha` value for the coordinate system.
     delta : ``int`` or ``float``
         :math:`\delta` value for the coordinate system.
-    cone : ``int`` or ``float``
-        Cone angle.
     distance : ``int``, ``float`` or ``None``
         Returns model velocity in km/s.
     velocity : ``int``, ``float`` or ``None``
@@ -246,32 +244,49 @@ class Result:
     coordinate = attr.ib()
     alpha = attr.ib()
     delta = attr.ib()
-    cone = attr.ib()
     distance = attr.ib()
     velocity = attr.ib()
 
     response_ = attr.ib(repr=False)
 
-    _json = attr.ib(init=False, repr=False)
+    observed_distance_ = attr.ib(init=False, repr=False)
+    observed_velocity_ = attr.ib(init=False, repr=False)
+    adjusted_distance_ = attr.ib(init=False, repr=False)
+    adjusted_velocity_ = attr.ib(init=False, repr=False)
 
-    def __dir__(self):
-        """dir(x) <==> x.__dir__()"""
-        return super().__dir__() + [f"{k}_" for k in self._json.keys()]
-
-    def __getattr__(self, a):
-        """x.y <==> x.__getattr__(x) <==> getattr(x, 'y')"""
-        a = a[:-1] if a.endswith("_") else a
-        if a not in self._json:
-            raise AttributeError(a)
-        return copy.copy(self._json[a])
-
-    @_json.default
-    def _json_default(self):
-        return self.response_.json()
+    search_at_ = attr.ib(init=False, repr=False)
 
     @property
     def json_(self):
-        return dict(self._json)
+        return self.response_.json()
+
+    @observed_distance_.default
+    def _observed_distance_default(self):
+        return np.array(self.json_["observed"]["distance"])
+
+    @observed_velocity_.default
+    def _observed_velocity_default(self):
+        return self.json_["observed"]["velocity"]
+
+    @adjusted_distance_.default
+    def _adjusted_distance_default(self):
+        return np.array(self.json_["adjusted"]["distance"])
+
+    @adjusted_velocity_.default
+    def _adjusted_velocity_default(self):
+        return self.json_["adjusted"]["velocity"]
+
+    @search_at_.default
+    def _search_at_default(self):
+        data = self.json_
+        return SearchAt(
+            ra=data["RA"],
+            dec=data["Dec"],
+            glon=data["Glon"],
+            glat=data["Glat"],
+            sgl=data["SGL"],
+            sgb=data["SGB"],
+        )
 
 
 # =============================================================================
@@ -279,7 +294,7 @@ class Result:
 # =============================================================================
 
 
-@attr.s(cmp=False, hash=False, frozen=True)
+@attr.s(eq=False, order=False, frozen=True)
 class CF3:
     """Client to access the *Cosmicflows-3 Distance-Velocity Calculator*
     (http://edd.ifa.hawaii.edu/CF3calculator/)
@@ -328,7 +343,6 @@ class CF3:
         coordinate_system,
         alpha,
         delta,
-        cone,
         distance=None,
         velocity=None,
         **get_kwargs,
@@ -350,11 +364,6 @@ class CF3:
             raise ValueError(
                 f"{DELTA[coordinate_system]} must be >= -90 and <= 90"
             )
-
-        if not isinstance(cone, (int, float)):
-            raise TypeError("Cone must be int or float")
-        elif cone < 0:
-            raise ValueError("Cone must be positive")
 
         if (distance, velocity) == (None, None):
             raise ValueError(
@@ -382,7 +391,7 @@ class CF3:
 
         # start the cache orchestration
         base = (
-            "CF3",
+            self.CALCULATOR,
             coordinate_system.value,
         )
         key = dcache.core.args_to_key(
@@ -411,7 +420,6 @@ class CF3:
             coordinate=coordinate_system,
             alpha=alpha,
             delta=delta,
-            cone=cone,
             distance=distance,
             velocity=velocity,
             response_=response,
@@ -427,7 +435,6 @@ class CF3:
         self,
         ra=187.78917,
         dec=13.33386,
-        cone=10.0,
         distance=None,
         velocity=None,
         **get_kwargs,
@@ -442,8 +449,6 @@ class CF3:
             Right ascension.
         dec : ``int`` or ``float`` (default: ``13.33386``)
             Declination. dec must be >= -90 and <= 90
-        cone : ``int`` or ``float`` (default: ``10``)
-            Points within this cone angle. cone must be >= 0.
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
@@ -463,7 +468,6 @@ class CF3:
             CoordinateSystem.equatorial,
             alpha=ra,
             delta=dec,
-            cone=cone,
             distance=distance,
             velocity=velocity,
             **get_kwargs,
@@ -474,7 +478,6 @@ class CF3:
         self,
         glon=282.96547,
         glat=75.41360,
-        cone=10.0,
         distance=None,
         velocity=None,
         **get_kwargs,
@@ -489,8 +492,6 @@ class CF3:
             Galactic longitude.
         glat: ``int`` or ``float`` (default: ``75.41360``)
             Galactic latitude. dec must be >= -90 and <= 90
-        cone : ``int`` or ``float`` (default: ``10``)
-            Points within this cone angle. cone must be >= 0.
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
@@ -510,7 +511,6 @@ class CF3:
             CoordinateSystem.galactic,
             alpha=glon,
             delta=glat,
-            cone=cone,
             distance=distance,
             velocity=velocity,
             **get_kwargs,
@@ -521,7 +521,6 @@ class CF3:
         self,
         sgl=102.0,
         sgb=-2.0,
-        cone=10.0,
         distance=None,
         velocity=None,
         **get_kwargs,
@@ -536,8 +535,6 @@ class CF3:
             Super-galactic longitude.
         sgb: ``int`` or ``float`` (default: ``-2``)
             Super-galactic latitude. dec must be >= -90 and <= 90
-        cone : ``int`` or ``float`` (default: ``10``)
-            Points within this cone angle. cone must be >= 0.
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
@@ -557,7 +554,6 @@ class CF3:
             CoordinateSystem.supergalactic,
             alpha=sgl,
             delta=sgb,
-            cone=cone,
             distance=distance,
             velocity=velocity,
             **get_kwargs,
