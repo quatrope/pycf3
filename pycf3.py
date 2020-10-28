@@ -242,6 +242,7 @@ class Result:
     url = attr.ib(repr=False)
 
     coordinate = attr.ib()
+    search_by = attr.ib()
     alpha = attr.ib()
     delta = attr.ib()
     distance = attr.ib()
@@ -418,6 +419,7 @@ class CF3:
             calculator=self.CALCULATOR,
             url=self.URL,
             coordinate=coordinate_system,
+            search_by=parameter,
             alpha=alpha,
             delta=delta,
             distance=distance,
