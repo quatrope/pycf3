@@ -60,6 +60,7 @@ from requests.packages.urllib3.util.retry import Retry
 # CONSTANTS
 # =============================================================================
 
+
 class CoordinateSystem(Enum):
     equatorial = "equatorial"
     galactic = "galactic"

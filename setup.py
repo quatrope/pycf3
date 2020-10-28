@@ -35,7 +35,7 @@ from setuptools import setup  # noqa
 
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
-REQUIREMENTS = ["numpy", "requests", "attrs", "bokeh", "pyquery", "diskcache"]
+REQUIREMENTS = ["numpy", "requests", "attrs", "diskcache"]
 
 with open(PATH / "README.rst") as fp:
     LONG_DESCRIPTION = fp.read()

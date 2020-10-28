@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2019, 2020 - Juan B Cabral
+# License: BSD-3-Clause
+#   Full Text: https://github.com/quatrope/pycf3/blob/master/LICENSE
+
+
+# =============================================================================
+# DOCS
+# =============================================================================
+
+"""Configuration for unittests
+
+"""
+
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+import os
+import pathlib
+
+import diskcache as dcache
+
+import joblib
+
+import pycf3
+
+import pytest
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+
+PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
+
+MOCK_PATH = PATH / "mock_data"
+
+
+# =============================================================================
+# FIXTURES
+# =============================================================================
+
+
+@pytest.fixture(scope="session")
+def load_mresponse():
+    def load(folder, fname):
+        return joblib.load(MOCK_PATH / folder / fname)
+
+    return load
+
+
+@pytest.fixture
+def no_cache():
+    return pycf3.NoCache()
+
+
+@pytest.fixture
+def cf3_no_cache(no_cache):
+    return pycf3.CF3(cache=no_cache)
+
+
+@pytest.fixture
+def tmp_cache(tmp_path):
+    cache = dcache.Cache(directory=tmp_path)
+    yield cache
+    cache.clear()
+
+
+@pytest.fixture
+def cf3_temp_cache(tmp_cache):
+    return pycf3.CF3(cache=tmp_cache)
