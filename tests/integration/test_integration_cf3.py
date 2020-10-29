@@ -26,15 +26,12 @@ Warning this code is SLOW!
 import random
 import time
 
-import diskcache as dcache
-
 from numpy import testing as npt
 
 import pycf3
 
 import pytest
 
-import requests
 
 # =============================================================================
 # MARKERS
@@ -47,6 +44,7 @@ pytestmark = pytest.mark.integration
 # SLEEP BASE
 # =============================================================================
 
+
 def teardown_function(function):
     s = random.random()
     time.sleep(s)
@@ -55,6 +53,7 @@ def teardown_function(function):
 # =============================================================================
 # EQUATORIAL TESTCASE
 # =============================================================================
+
 
 def test_integration_equatorial_search(cf3_temp_cache):
     cf3 = cf3_temp_cache
@@ -99,9 +98,9 @@ def test_integration_equatorial_search(cf3_temp_cache):
     assert len(cf3.cache) == 2
 
 
-# # =============================================================================
-# # GALACTIC TEST CASE
-# # =============================================================================
+# =============================================================================
+# GALACTIC TEST CASE
+# =============================================================================
 
 
 def test_integration_galactic_search(cf3_temp_cache):
@@ -148,6 +147,7 @@ def test_integration_galactic_search(cf3_temp_cache):
 # =============================================================================
 # SUPER-GALACTIC TEST CASE
 # =============================================================================
+
 
 def test_integration_supergalactic_search(cf3_temp_cache):
     cf3 = cf3_temp_cache

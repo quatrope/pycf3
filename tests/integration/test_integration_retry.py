@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2019, 2020 - Juan B Cabral
+# Copyright (c) 2019, Juan B Cabral
 # License: BSD-3-Clause
 #   Full Text: https://github.com/quatrope/pycf3/blob/master/LICENSE
 
@@ -10,7 +10,9 @@
 # DOCS
 # =============================================================================
 
-"""Configuration for unittests
+"""Integration Test for cache implementation.
+
+Warning this code is SLOW!
 
 """
 
@@ -19,66 +21,54 @@
 # IMPORTS
 # =============================================================================
 
-import os
-import pathlib
-
-import diskcache as dcache
-
-import joblib
+import random
+import time
 
 import pycf3
 
 import pytest
 
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
-
-MOCK_PATH = PATH / "mock_data"
-
+import requests
 
 # =============================================================================
 # MARKERS
 # =============================================================================
 
-
-def pytest_collection_modifyitems(items):
-    for item in items:
-        item.add_marker(pytest.mark.ALL)
+pytestmark = pytest.mark.integration
 
 
 # =============================================================================
-# FIXTURES
+# SLEEP BASE
 # =============================================================================
 
 
-@pytest.fixture(scope="session")
-def load_mresponse():
-    def load(folder, fname):
-        return joblib.load(MOCK_PATH / folder / fname)
-
-    return load
+def teardown_function(function):
+    s = random.random()
+    time.sleep(s)
 
 
-@pytest.fixture
-def no_cache():
-    return pycf3.NoCache()
+# =============================================================================
+# RETRY
+# =============================================================================
 
 
-@pytest.fixture
-def cf3_no_cache(no_cache):
-    return pycf3.CF3(cache=no_cache)
+def test_integration_timeout(cf3_temp_cache, monkeypatch):
+    monkeypatch.setattr(pycf3.CF3, "URL", "http://httpbin.org/delay/10")
+
+    cf3 = cf3_temp_cache
+
+    t0 = time.time()
+    with pytest.raises(requests.ConnectionError):
+        cf3.equatorial_search(distance=10, timeout=2)
+    total_time = time.time() - t0
+
+    assert total_time > 2
 
 
-@pytest.fixture
-def tmp_cache(tmp_path):
-    cache = dcache.Cache(directory=tmp_path)
-    yield cache
-    cache.clear()
+def test_integration_http_status_500(cf3_temp_cache, monkeypatch):
+    monkeypatch.setattr(pycf3.CF3, "URL", "http://httpbin.org/status/500")
 
+    cf3 = cf3_temp_cache
 
-@pytest.fixture
-def cf3_temp_cache(tmp_cache):
-    return pycf3.CF3(cache=tmp_cache)
+    with pytest.raises(requests.exceptions.RetryError):
+        cf3.equatorial_search(distance=10)
