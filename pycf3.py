@@ -10,7 +10,9 @@
 # DOCS
 # =============================================================================
 
-"""Python client for
+"""Python client for several cosmic distance calculators.
+
+Calculators:
 
 - Cosmicflows-3 Distance-Velocity Calculator at distances
 - Numerical Action Methods model
@@ -95,12 +97,12 @@ class RetrySession(requests.Session):
 
     Parameters
     ----------
-
     retries: ``int`` (default: ``3``)
         Total number of retries to allow.
         It's a good idea to set this to some sensibly-high value to
         account for unexpected edge cases and avoid infinite retry loops.
         Set to ``0`` to fail on the first retry.
+
     backoff_factor: ``float`` (default: ``0.3``)
         A backoff factor to apply between attempts after the second try (most
         errors are resolved immediately by a second try without a delay).
@@ -119,7 +121,6 @@ class RetrySession(requests.Session):
         response status code is in status_forcelist.
 
         By default, this is ``500, 502, 504``.
-
 
     """
 
@@ -153,40 +154,55 @@ class RetrySession(requests.Session):
 
 
 class NoCache(MutableMapping):
-    """Implements a no cache with the minimun methods to be used with
-    CF3 class"""
+    """Implements a minimalist no-cache for disk-cache."""
 
     def get(self, key, default=None, *args, **kwargs):
-        """Always return the ``default``"""
+        """Return the ``default``."""
         return default
 
     def set(self, key, value, *args, **kwargs):
-        """This method do nothing. Always return True"""
+        """Return True."""
         return True
 
     def expire(self, now=None, retry=False):
-        """Always return 0"""
+        """Return 0."""
         return 0
 
     def __len__(self):
+        """len(x) <==> x.__len__()."""
         return 0
 
     def __enter__(self):
+        """Enter the runtime context related to this object.
+
+        The with statement will bind this method’s return value to the
+        target(s) specified in the as clause of the statement, if any.
+
+        """
         return self
 
-    def __exit__(self, *exeption):
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Exit the runtime context related to this object.
+
+        The parameters describe the exception that caused the context to be exited. If the context was exited without an exception, all three arguments will be None.
+
+        """
         pass
 
     def __delitem__(self, k):
+        """x.__del__(k) <==> del x.k."""
         raise KeyError(k)
 
     def __getitem__(self, k):
+        """x[k] <==> x.__getitem__(k)."""
         raise KeyError(k)
 
     def __iter__(self):
+        """iter(x) <==> x.__iter__()."""
         return iter({})
 
     def __setitem__(self, k, v):
+        """x[k] = v <==> x.__setitem__(k, v)."""
         pass
 
 
@@ -199,11 +215,10 @@ SearchAt = namedtuple("SearchAt", ["ra", "dec", "glon", "glat", "sgl", "sgb"])
 
 @attr.s(eq=False, order=False, frozen=True)
 class Result:
-    r"""Parsed result -
+    r"""Parsed result.
 
     Parameters
     ----------
-
     calculator : ``str``
         The used calculator.
     url : ``str``
@@ -221,14 +236,11 @@ class Result:
 
     Attributes
     ----------
-
     response_ : ``requests.Response``
         Original response object create by the *requests* library.
         More information: https://2.python-requests.org
-
     json_: ``dict``
         The parsed data inside the response.
-
 
     """
 
