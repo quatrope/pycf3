@@ -10,21 +10,12 @@
 # DOCS
 # =============================================================================
 
-"""Python client for Cosmicflows-3 Distance-Velocity Calculator at distances
-less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
+"""Python client for
 
-Compute expectation distances or velocities based on smoothed velocity
-field from the Wiener filter model of Graziani et al. 2019
-(https://ui.adsabs.harvard.edu/abs/2019MNRAS.488.5438G/abstract).
+- Cosmicflows-3 Distance-Velocity Calculator at distances
+- Numerical Action Methods model
 
 More information: http://edd.ifa.hawaii.edu/CF3calculator/
-
-All data exposed by pycf3 belongs to the project
-
-Cosmicflows-3 Distance-Velocity Calculator
-(http://edd.ifa.hawaii.edu/CF3calculator/)
-Copyright (C) Cosmicflows Team
-The Extragalactic Distance Database (EDD)
 
 For citation check:
     https://github.com/quatrope/pycf3/blob/master/README.rst
@@ -49,12 +40,15 @@ from enum import Enum
 
 import attr
 
+from custom_inherit import DocInheritMeta
+
 import diskcache as dcache
 
 import numpy as np
 
 import requests
 from requests.packages.urllib3.util.retry import Retry
+
 
 # =============================================================================
 # CONSTANTS
@@ -91,52 +85,8 @@ PYCF3_DATA = os.path.expanduser(os.path.join("~", "pycf3_data"))
 
 DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
 
-
 # =============================================================================
-# NO CACHE CLASS
-# =============================================================================
-
-
-class NoCache(MutableMapping):
-    """Implements a no cache with the minimun methods to be used with
-    CF3 class"""
-
-    def get(self, key, default=None, *args, **kwargs):
-        """Always return the ``default``"""
-        return default
-
-    def set(self, key, value, *args, **kwargs):
-        """This method do nothing. Always return True"""
-        return True
-
-    def expire(self, now=None, retry=False):
-        """Always return 0"""
-        return 0
-
-    def __len__(self):
-        return 0
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exeption):
-        pass
-
-    def __delitem__(self, k):
-        raise KeyError(k)
-
-    def __getitem__(self, k):
-        raise KeyError(k)
-
-    def __iter__(self):
-        return iter({})
-
-    def __setitem__(self, k, v):
-        pass
-
-
-# =============================================================================
-# SESSION OBJECT
+# RETRY SESSION IMPLEMENTATION
 # =============================================================================
 
 
@@ -195,6 +145,49 @@ class RetrySession(requests.Session):
         self.mount("https://", self.adapter_)
 
         self.total_backoff_ = float(backoff_factor) * (2 ** (retries - 1))
+
+
+# =============================================================================
+# NO CACHE CLASS
+# =============================================================================
+
+
+class NoCache(MutableMapping):
+    """Implements a no cache with the minimun methods to be used with
+    CF3 class"""
+
+    def get(self, key, default=None, *args, **kwargs):
+        """Always return the ``default``"""
+        return default
+
+    def set(self, key, value, *args, **kwargs):
+        """This method do nothing. Always return True"""
+        return True
+
+    def expire(self, now=None, retry=False):
+        """Always return 0"""
+        return 0
+
+    def __len__(self):
+        return 0
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exeption):
+        pass
+
+    def __delitem__(self, k):
+        raise KeyError(k)
+
+    def __getitem__(self, k):
+        raise KeyError(k)
+
+    def __iter__(self):
+        return iter({})
+
+    def __setitem__(self, k, v):
+        pass
 
 
 # =============================================================================
@@ -292,14 +285,13 @@ class Result:
 
 
 # =============================================================================
-# CLIENT
+# ABSTRACT CLIENT
 # =============================================================================
 
 
 @attr.s(eq=False, order=False, frozen=True)
-class CF3:
-    """Client to access the *Cosmicflows-3 Distance-Velocity Calculator*
-    (http://edd.ifa.hawaii.edu/CF3calculator/)
+class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
+    """Abstract base class for all clients.
 
     Parameters
     ----------
@@ -321,13 +313,6 @@ class CF3:
 
     """
 
-    CALCULATOR = "CF3"
-    URL = "http://edd.ifa.hawaii.edu/CF3calculator/api.php"
-
-    # =========================================================================
-    # ATTRS SETUP
-    # =========================================================================
-
     session: requests.Session = attr.ib(factory=RetrySession, repr=False)
     cache: t.Union[dcache.Cache, dcache.FanoutCache] = attr.ib()
     cache_expire: float = attr.ib(default=None, repr=False)
@@ -335,10 +320,6 @@ class CF3:
     @cache.default
     def _cache_default(self):
         return dcache.Cache(directory=DEFAULT_CACHE_DIR)
-
-    # =========================================================================
-    # INTERNAL
-    # =========================================================================
 
     def _search(
         self,
@@ -354,7 +335,7 @@ class CF3:
         if coordinate_system not in CoordinateSystem:
             raise TypeError(
                 "coordinate_system must be a member of "
-                "pycf3.CoordinateSystem enum"
+                "pycf3.core.CoordinateSystem enum"
             )
 
         if not isinstance(alpha, (int, float)):
@@ -430,10 +411,6 @@ class CF3:
 
         return result
 
-    # =========================================================================
-    # PUBLIC API
-    # =========================================================================
-
     def equatorial_search(
         self,
         ra=187.78917,
@@ -464,7 +441,7 @@ class CF3:
 
         pycf3.Result :
             Result object that automatically parses the entire model
-            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+            returned by the remote calculator.
 
         """
         response = self._search(
@@ -507,7 +484,7 @@ class CF3:
 
         pycf3.Result :
             Result object that automatically parses the entire model
-            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+            returned by the remote calculator.
 
         """
         response = self._search(
@@ -550,7 +527,7 @@ class CF3:
 
         pycf3.Result :
             Result object that automatically parses the entire model
-            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+            returned by the remote calculator.
 
         """
         response = self._search(
@@ -562,3 +539,35 @@ class CF3:
             **get_kwargs,
         )
         return response
+
+
+# =============================================================================
+# CF3 CLIENT
+# =============================================================================
+
+
+class CF3(AbstractClient):
+    """Client to access the *Cosmicflows-3 Distance-Velocity Calculator*
+    (http://edd.ifa.hawaii.edu/CF3calculator/) [1]_.
+
+    It computes expectation distances or velocities based on smoothed
+    velocity field from the Wiener filter model of Graziani et al. 2019 [2]_.
+
+    References
+    ----------
+
+    .. [1] Kourkchi, E., Courtois, H. M., Graziani, R., Hoffman, Y.,
+       Pomarede, D., Shaya, E. J., & Tully, R. B. (2020).
+       Cosmicflows-3: Two Distance-Velocity Calculators.
+       The Astronomical Journal, 159(2), 67.
+
+    .. [2] Graziani, R., Courtois, H. M., Lavaux, G., Hoffman, Y.,
+       Tully, R. B., Copin, Y., & Pomarède, D. (2019).
+       The peculiar velocity field up to z∼ 0.05 by forward-modelling
+       Cosmicflows-3 data. Monthly Notices of the Royal Astronomical Society,
+       488(4), 5438-5451.
+
+    """
+
+    CALCULATOR = "CF3"
+    URL = "http://edd.ifa.hawaii.edu/CF3calculator/api.php"

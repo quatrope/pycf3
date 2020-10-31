@@ -35,7 +35,7 @@ from setuptools import setup  # noqa
 
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
-REQUIREMENTS = ["numpy", "requests", "attrs", "diskcache"]
+REQUIREMENTS = ["numpy", "requests", "attrs", "diskcache", "custom_inherit"]
 
 with open(PATH / "README.rst") as fp:
     LONG_DESCRIPTION = fp.read()
@@ -86,7 +86,7 @@ def do_setup():
             "License :: OSI Approved :: BSD License",
             "Operating System :: OS Independent",
             "Programming Language :: Python",
-            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3",
             "Programming Language :: Python :: Implementation :: CPython",
             "Topic :: Scientific/Engineering",
         ),
