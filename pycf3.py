@@ -131,6 +131,7 @@ class RetrySession(requests.Session):
         status_forcelist=(500, 502, 504),
         **session_options,
     ):
+        """Create a new instance."""
         super().__init__(**session_options)
         retries = retries or 0
 
@@ -169,7 +170,7 @@ class NoCache(MutableMapping):
         return 0
 
     def __len__(self):
-        """len(x) <==> x.__len__()."""
+        """Return 0."""
         return 0
 
     def __enter__(self):
@@ -184,25 +185,27 @@ class NoCache(MutableMapping):
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit the runtime context related to this object.
 
-        The parameters describe the exception that caused the context to be exited. If the context was exited without an exception, all three arguments will be None.
+        The parameters describe the exception that caused the context to be
+        exited. If the context was exited without an exception, all three
+        arguments will be None.
 
         """
         pass
 
     def __delitem__(self, k):
-        """x.__del__(k) <==> del x.k."""
+        """Raise KeyError."""
         raise KeyError(k)
 
     def __getitem__(self, k):
-        """x[k] <==> x.__getitem__(k)."""
+        """Raise KeyError."""
         raise KeyError(k)
 
     def __iter__(self):
-        """iter(x) <==> x.__iter__()."""
+        """Return an empty iterator."""
         return iter({})
 
     def __setitem__(self, k, v):
-        """x[k] = v <==> x.__setitem__(k, v)."""
+        """Do nothing."""
         pass
 
 
@@ -265,6 +268,7 @@ class Result:
 
     @property
     def json_(self):
+        """Proxy to ``response_.json()``."""
         return self.response_.json()
 
     @observed_distance_.default
@@ -307,7 +311,6 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
     Parameters
     ----------
-
     session : ``pycf3.Session`` (default: ``None``)
         The session to use to send the requests. By default a
         ``pyc3.RetrySession`` with 3 retry is created. More info:
@@ -431,12 +434,12 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         velocity=None,
         **get_kwargs,
     ):
-        """Search around the sky position expressed in equatorial coordinates
-        (J2000 as 360° decimal) in degrees.
+        """Search by equatorial coordinates.
+
+        The coordinates are expressed in J2000 as 360° decimal.
 
         Parameters
         ----------
-
         ra : ``int`` or ``float`` (default: ``187.78917``)
             Right ascension.
         dec : ``int`` or ``float`` (default: ``13.33386``)
@@ -450,7 +453,6 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
         Returns
         -------
-
         pycf3.Result :
             Result object that automatically parses the entire model
             returned by the remote calculator.
@@ -474,12 +476,12 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         velocity=None,
         **get_kwargs,
     ):
-        """Search around the sky position expressed in galactic coordinates
-        (J2000 as 360° decimal) in degrees.
+        """Search by galactic coordinates.
+
+        The coordinates are expressed in J2000 as 360° decimal.
 
         Parameters
         ----------
-
         glon : ``int`` or ``float`` (default: ``282.96547``)
             Galactic longitude.
         glat: ``int`` or ``float`` (default: ``75.41360``)
@@ -493,7 +495,6 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
         Returns
         -------
-
         pycf3.Result :
             Result object that automatically parses the entire model
             returned by the remote calculator.
@@ -517,12 +518,12 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         velocity=None,
         **get_kwargs,
     ):
-        """Search around the sky position expressed in super-galactic
-        coordinates (J2000 as 360° decimal) in degrees.
+        """Search super-galactic coordinates.
+
+        The coordinates are expressed in J2000 as 360° decimal.
 
         Parameters
         ----------
-
         sgl : ``int`` or ``float`` (default: ``102``)
             Super-galactic longitude.
         sgb: ``int`` or ``float`` (default: ``-2``)
@@ -536,7 +537,6 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
         Returns
         -------
-
         pycf3.Result :
             Result object that automatically parses the entire model
             returned by the remote calculator.
@@ -559,15 +559,15 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
 
 class CF3(AbstractClient):
-    """Client to access the *Cosmicflows-3 Distance-Velocity Calculator*
-    (http://edd.ifa.hawaii.edu/CF3calculator/) [1]_.
+    """Client for the *Cosmicflows-3 Distance-Velocity Calculator* [1]_.
 
     It computes expectation distances or velocities based on smoothed
     velocity field from the Wiener filter model of Graziani et al. 2019 [2]_.
 
+    More information: http://edd.ifa.hawaii.edu/CF3calculator/ .
+
     References
     ----------
-
     .. [1] Kourkchi, E., Courtois, H. M., Graziani, R., Hoffman, Y.,
        Pomarede, D., Shaya, E. J., & Tully, R. B. (2020).
        Cosmicflows-3: Two Distance-Velocity Calculators.
