@@ -46,7 +46,7 @@ matrix:
         sudo: true
 
       - python: 3.9
-        env: TOXENV=py38
+        env: TOXENV=py39
         dist: xenial
         sudo: true
 
