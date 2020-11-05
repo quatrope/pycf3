@@ -96,16 +96,33 @@ All data exposed by pycf3 belongs to the project
 
 Please cite:
 
-    Shaya, E. J., Tully, R. B., Hoffman, Y., & Pomarède, D. (2017). Action dynamics
-    of the local supercluster. arXiv preprint arXiv:1710.08935.
+    Kourkchi, E., Courtois, H. M., Graziani, R., Hoffman, Y., Pomarede, D.,
+    Shaya, E. J., & Tully, R. B. (2020). Cosmicflows-3: Two Distance–Velocity
+    Calculators. The Astronomical Journal, 159(2), 67.
 
 BibText::
 
-    @article{shaya2017action,
-        title={Action dynamics of the local supercluster},
-        author={Shaya, Edward J and Tully, R Brent and Hoffman, Yehuda and Pomar{\`e}de, Daniel},
-        journal={arXiv preprint arXiv:1710.08935},
-        year={2017}
+    @ARTICLE{2020AJ....159...67K,
+        author = {{Kourkchi}, Ehsan and {Courtois}, H{\'e}l{\`e}ne M. and
+         {Graziani}, Romain and {Hoffman}, Yehuda and {Pomar{\`e}de}, Daniel and
+         {Shaya}, Edward J. and {Tully}, R. Brent},
+        title = "{Cosmicflows-3: Two Distance-Velocity Calculators}",
+        journal = {\aj},
+        keywords = {590, 1146, 902, 1968, Astrophysics - Cosmology and
+            Nongalactic Astrophysics, Astrophysics - Astrophysics of Galaxies,
+            Astrophysics - Instrumentation and Methods for Astrophysics},
+        year = 2020,
+        month = feb,
+        volume = {159},
+        number = {2},
+        eid = {67},
+        pages = {67},
+        doi = {10.3847/1538-3881/ab620e},
+        archivePrefix = {arXiv},
+        eprint = {1912.07214},
+        primaryClass = {astro-ph.CO},
+        adsurl = {https://ui.adsabs.harvard.edu/abs/2020AJ....159...67K},
+        adsnote = {Provided by the SAO/NASA Astrophysics Data System}
     }
 
 

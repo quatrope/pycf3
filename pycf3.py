@@ -10,38 +10,43 @@
 # DOCS
 # =============================================================================
 
-"""Python client for Cosmicflows-3 Distance-Velocity Calculator at distances
-less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
+"""Python client for several cosmic distance calculators.
 
-Compute expectation distances or velocities based on smoothed velocity
-field from the Wiener filter model of Graziani et al. 2019
-(https://ui.adsabs.harvard.edu/abs/2019MNRAS.488.5438G/abstract).
+Calculators:
+
+- Cosmicflows-3 Distance-Velocity Calculator at distances
+- Numerical Action Methods model
 
 More information: http://edd.ifa.hawaii.edu/CF3calculator/
+
+For citation check:
+    https://github.com/quatrope/pycf3/blob/master/README.rst
 
 """
 
 
 __all__ = ["CF3", "Result", "NoCache", "RetrySession"]
 
-__version__ = "2019.10"
+__version__ = "2020.11b"
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+import os
+import typing as t
 from collections import namedtuple
 from collections.abc import MutableMapping
 from enum import Enum
-import typing as t
-import os
 
 import attr
 
+from custom_inherit import DocInheritMeta
+
 import diskcache as dcache
 
-import pyquery as pq
+import numpy as np
 
 import requests
 from requests.packages.urllib3.util.retry import Retry
@@ -51,113 +56,53 @@ from requests.packages.urllib3.util.retry import Retry
 # CONSTANTS
 # =============================================================================
 
+
 class CoordinateSystem(Enum):
     equatorial = "equatorial"
     galactic = "galactic"
     supergalactic = "supergalactic"
 
 
+class Parameter(Enum):
+    distance = "distance"
+    velocity = "velocity"
+
+
 ALPHA = {
     CoordinateSystem.equatorial: "ra",
     CoordinateSystem.galactic: "glon",
-    CoordinateSystem.supergalactic: "sgl"
+    CoordinateSystem.supergalactic: "sgl",
 }
 
 
 DELTA = {
     CoordinateSystem.equatorial: "dec",
     CoordinateSystem.galactic: "glat",
-    CoordinateSystem.supergalactic: "sgb"
+    CoordinateSystem.supergalactic: "sgb",
 }
 
 
-URL = "http://edd.ifa.hawaii.edu/CF3calculator/getData.php"
-
-
-PYCF3_DATA = os.path.expanduser(os.path.join('~', 'pycf3_data'))
+PYCF3_DATA = os.path.expanduser(os.path.join("~", "pycf3_data"))
 
 
 DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
 
-
-CITATION_INFO = """
-All data exposed by pycf3 belongs to the project
-
-Cosmicflows-3 Distance-Velocity Calculator
-(http://edd.ifa.hawaii.edu/CF3calculator/)
-Copyright (C) Cosmicflows Team
-The Extragalactic Distance Database (EDD)
-
-For citation check:
-    https://github.com/quatrope/pycf3/blob/master/README.rst
-
-"""
-
-
 # =============================================================================
-# Recognition
+# RETRY SESSION IMPLEMENTATION
 # =============================================================================
 
-print(CITATION_INFO)
-
-
-# =============================================================================
-# NO CACHE CLASS
-# =============================================================================
-
-class NoCache(MutableMapping):
-    """Implements a no cache with the minimun methods to be used with
-    CF3 class"""
-
-    def get(self, key, default=None, *args, **kwargs):
-        """Always return the ``default``"""
-        return default
-
-    def set(self, key, value, *args, **kwargs):
-        """This method do nothing. Always return True"""
-        return True
-
-    def expire(self, now=None, retry=False):
-        """Always return 0"""
-        return 0
-
-    def __len__(self):
-        return 0
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exeption):
-        pass
-
-    def __delitem__(self, k):
-        raise KeyError(k)
-
-    def __getitem__(self, k):
-        raise KeyError(k)
-
-    def __iter__(self):
-        return iter({})
-
-    def __setitem__(self, k, v):
-        pass
-
-
-# =============================================================================
-# SESSION OBJECT
-# =============================================================================
 
 class RetrySession(requests.Session):
     """Session with retry.
 
     Parameters
     ----------
-
     retries: ``int`` (default: ``3``)
         Total number of retries to allow.
         It's a good idea to set this to some sensibly-high value to
         account for unexpected edge cases and avoid infinite retry loops.
         Set to ``0`` to fail on the first retry.
+
     backoff_factor: ``float`` (default: ``0.3``)
         A backoff factor to apply between attempts after the second try (most
         errors are resolved immediately by a second try without a delay).
@@ -169,19 +114,24 @@ class RetrySession(requests.Session):
         sleep for ``[0.0s, 0.2s, 0.4s, ...]`` between retries. It will never be
         longer than ``urllib3.Retry.BACKOFF_MAX``.
 
-    status_forcelist: iterable (default: ``(500, 502, 504``)
+    status_forcelist: iterable (default: ``500, 502, 504``)
 
         A set of integer HTTP status codes that we should force a retry on. A
         retry is initiated if the request method is in method_whitelist and the
         response status code is in status_forcelist.
 
-        By default, this is ``(500, 502, 504``.
-
+        By default, this is ``500, 502, 504``.
 
     """
-    def __init__(self, retries=3, backoff_factor=0.3,
-                 status_forcelist=(500, 502, 504),
-                 **session_options):
+
+    def __init__(
+        self,
+        retries=3,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 504),
+        **session_options,
+    ):
+        """Create a new instance."""
         super().__init__(**session_options)
         retries = retries or 0
 
@@ -190,36 +140,98 @@ class RetrySession(requests.Session):
             read=retries,
             connect=retries,
             backoff_factor=backoff_factor,
-            status_forcelist=status_forcelist)
+            status_forcelist=status_forcelist,
+        )
         self.adapter_ = requests.adapters.HTTPAdapter(max_retries=self.retry_)
-        self.mount('http://', self.adapter_)
-        self.mount('https://', self.adapter_)
+        self.mount("http://", self.adapter_)
+        self.mount("https://", self.adapter_)
 
         self.total_backoff_ = float(backoff_factor) * (2 ** (retries - 1))
+
+
+# =============================================================================
+# NO CACHE CLASS
+# =============================================================================
+
+
+class NoCache(MutableMapping):
+    """Implements a minimalist no-cache for disk-cache."""
+
+    def get(self, key, default=None, *args, **kwargs):
+        """Return the ``default``."""
+        return default
+
+    def set(self, key, value, *args, **kwargs):
+        """Return True."""
+        return True
+
+    def expire(self, now=None, retry=False):
+        """Return 0."""
+        return 0
+
+    def __len__(self):
+        """Return 0."""
+        return 0
+
+    def __enter__(self):
+        """Enter the runtime context related to this object.
+
+        The with statement will bind this method’s return value to the
+        target(s) specified in the as clause of the statement, if any.
+
+        """
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Exit the runtime context related to this object.
+
+        The parameters describe the exception that caused the context to be
+        exited. If the context was exited without an exception, all three
+        arguments will be None.
+
+        """
+        pass
+
+    def __delitem__(self, k):
+        """Raise KeyError."""
+        raise KeyError(k)
+
+    def __getitem__(self, k):
+        """Raise KeyError."""
+        raise KeyError(k)
+
+    def __iter__(self):
+        """Return an empty iterator."""
+        return iter({})
+
+    def __setitem__(self, k, v):
+        """Do nothing."""
+        pass
 
 
 # =============================================================================
 # RESPONSE OBJECT
 # =============================================================================
 
-SearchAt = namedtuple("SearchAt", ['ra', 'dec', 'glon', 'glat', 'sgl', 'sgb'])
+SearchAt = namedtuple("SearchAt", ["ra", "dec", "glon", "glat", "sgl", "sgb"])
 
 
-@attr.s(cmp=False, hash=False, frozen=True)
+@attr.s(eq=False, order=False, frozen=True)
 class Result:
-    r"""Parsed result of the *Cosmicflows-3 Distance-Velocity Calculator*-
+    r"""Parsed result.
 
     Parameters
     ----------
-
+    calculator : ``str``
+        The used calculator.
+    url : ``str``
+        The url of the calculator.
     coordinate : ``Coordinate``
         Coordinate system used to create this result.
     alpha : ``int`` or ``float``
         :math:`\alpha` value for the coordinate system.
     delta : ``int`` or ``float``
         :math:`\delta` value for the coordinate system.
-    cone : ``int`` or ``float``
-        Cone angle.
     distance : ``int``, ``float`` or ``None``
         Returns model velocity in km/s.
     velocity : ``int``, ``float`` or ``None``
@@ -227,106 +239,78 @@ class Result:
 
     Attributes
     ----------
-
     response_ : ``requests.Response``
         Original response object create by the *requests* library.
         More information: https://2.python-requests.org
-    d_ : ``pyquery.PyQuery``
-        Parsed *HTML* response inside a PyQuery object.
-        More information: https://pythonhosted.org/pyquery/
-    search_at_ : ``pycf3.SearhAt``
-        :math:`\alpha` and :math:`\delta` in all the available coordinate
-        systems.
-    Vls_Observed_ : ``float`` or ``None``
-        Observed velocity, :math:`V_{ls}`, vs. distance. `Vls_Observed_` is
-        ``None`` if `distance` is ``None``
-    Vcls_Adjusted_ : ``float`` or ``None``
-        Cosmologically  adjusted velocity, :math:`V_{ls}^c`, vs. distance.
-        The corrected velocity :math:`V_{ls}^c` is related to the observed
-        velocity :math:`V_{ls}` by:
-
-        .. math::
-
-            V_{ls}^c = f(z)V_{ls}
-
-        where
-
-        .. math::
-
-            f(z) = 1+1/2(1-q_0)z-1/6(2-q_0-3q_0^2)z^2
-
-        .. math::
-
-            q_0 = 1/2(\Omega_m-2\Omega_{\Lambda}) = -0.595
-
-        when :math:`\Omega_m=0.27`, :math:`\Omega_{\Lambda}=0.73` and
-        :math:`z=V_{ls}/c`.
-
-        `Vcls_Adjusted_` is ``None`` if `distance` is ``None``.
-
+    json_: ``dict``
+        The parsed data inside the response.
 
     """
 
+    calculator = attr.ib()
+    url = attr.ib(repr=False)
+
     coordinate = attr.ib()
+    search_by = attr.ib()
     alpha = attr.ib()
     delta = attr.ib()
-    cone = attr.ib()
     distance = attr.ib()
     velocity = attr.ib()
 
     response_ = attr.ib(repr=False)
-    d_ = attr.ib(repr=False)
 
-    search_at_ = attr.ib(init=False)
-    Vls_Observed_ = attr.ib(repr=False, init=False)
-    Vcls_Adjusted_ = attr.ib(repr=False, init=False)
+    observed_distance_ = attr.ib(init=False, repr=False)
+    observed_velocity_ = attr.ib(init=False, repr=False)
+    adjusted_distance_ = attr.ib(init=False, repr=False)
+    adjusted_velocity_ = attr.ib(init=False, repr=False)
+
+    search_at_ = attr.ib(init=False, repr=False)
+
+    @property
+    def json_(self):
+        """Proxy to ``response_.json()``."""
+        return self.response_.json()
+
+    @observed_distance_.default
+    def _observed_distance_default(self):
+        return np.array(self.json_["observed"]["distance"])
+
+    @observed_velocity_.default
+    def _observed_velocity_default(self):
+        return self.json_["observed"]["velocity"]
+
+    @adjusted_distance_.default
+    def _adjusted_distance_default(self):
+        return np.array(self.json_["adjusted"]["distance"])
+
+    @adjusted_velocity_.default
+    def _adjusted_velocity_default(self):
+        return self.json_["adjusted"]["velocity"]
 
     @search_at_.default
-    def _search_at__default(self):
-        coords_table = self.d_("table:last")
-
-        eq_coords = coords_table.find("td:contains('RA:')").parent()
-        ra, dec = (float(e.text) for e in eq_coords.find("td")[1::2])
-
-        gal_coords = coords_table.find("td:contains('Glon:')").parent()
-        glon, glat = (float(e.text) for e in gal_coords.find("td")[1::2])
-
-        sg_coords = coords_table.find("td:contains('SGL:')").parent()
-        sgl, sgb = (float(e.text) for e in sg_coords.find("td")[1::2])
-
-        return SearchAt(ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb)
-
-    @Vls_Observed_.default
-    def _Vls_Observed__default(self):
-        if self.distance is None:
-            return None
-        vlso_table = self.d_(
-            "span:contains(' - Observed')").parents("table#calc")
-        return float(vlso_table.find("td#calc")[1].text)
-
-    @Vcls_Adjusted_.default
-    def _Vcls_Adjusted__default(self):
-        if self.distance is None:
-            return None
-        vclso_table = self.d_(
-            "span:contains(' - Adjusted')").parents("table#calc")
-        return float(vclso_table.find("td#calc")[1].text)
+    def _search_at_default(self):
+        data = self.json_
+        return SearchAt(
+            ra=data["RA"],
+            dec=data["Dec"],
+            glon=data["Glon"],
+            glat=data["Glat"],
+            sgl=data["SGL"],
+            sgb=data["SGB"],
+        )
 
 
 # =============================================================================
-# CLIENT
+# ABSTRACT CLIENT
 # =============================================================================
 
-@attr.s(cmp=False, hash=False, frozen=True)
-class CF3:
-    """Client to access the *Cosmicflows-3 Distance-Velocity Calculator*
-    (http://edd.ifa.hawaii.edu/CF3calculator/)
+
+@attr.s(eq=False, order=False, frozen=True)
+class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
+    """Abstract base class for all clients.
 
     Parameters
     ----------
-
-    url : ``str`` (default: ``pycf3.URL``)
-        The endpoint of the cosmic flow calculator.
     session : ``pycf3.Session`` (default: ``None``)
         The session to use to send the requests. By default a
         ``pyc3.RetrySession`` with 3 retry is created. More info:
@@ -344,11 +328,6 @@ class CF3:
 
     """
 
-    # =========================================================================
-    # ATTRS SETUP
-    # =========================================================================
-
-    url: str = attr.ib(default=URL, repr=True)
     session: requests.Session = attr.ib(factory=RetrySession, repr=False)
     cache: t.Union[dcache.Cache, dcache.FanoutCache] = attr.ib()
     cache_expire: float = attr.ib(default=None, repr=False)
@@ -357,18 +336,22 @@ class CF3:
     def _cache_default(self):
         return dcache.Cache(directory=DEFAULT_CACHE_DIR)
 
-    # =========================================================================
-    # INTERNAL
-    # =========================================================================
-
-    def _search(self, coordinate_system, alpha, delta, cone,
-                distance=None, velocity=None, **post_kwargs):
+    def _search(
+        self,
+        coordinate_system,
+        alpha,
+        delta,
+        distance=None,
+        velocity=None,
+        **get_kwargs,
+    ):
 
         # The validations
         if coordinate_system not in CoordinateSystem:
             raise TypeError(
                 "coordinate_system must be a member of "
-                "pycf3.CoordinateSystem enum")
+                "pycf3.core.CoordinateSystem enum"
+            )
 
         if not isinstance(alpha, (int, float)):
             raise TypeError(f"{ALPHA[coordinate_system]} must be int or float")
@@ -377,162 +360,226 @@ class CF3:
             raise TypeError(f"{DELTA[coordinate_system]} must be int or float")
         elif not (-90 <= delta <= 90):
             raise ValueError(
-                f"{DELTA[coordinate_system]} must be >= -90 and <= 90")
+                f"{DELTA[coordinate_system]} must be >= -90 and <= 90"
+            )
 
-        if not isinstance(cone, (int, float)):
-            raise TypeError(f"cone must be int or float")
-        elif cone < 0:
-            raise ValueError("Cone must be positive")
-
-        if distance is not None and velocity is not None:
+        if (distance, velocity) == (None, None):
             raise ValueError(
-                "You cant provide velocity and distance at the same time")
+                "You must provide the distance or the velocity value"
+            )
+        elif distance is not None and velocity is not None:
+            raise ValueError(
+                "You cant provide velocity and distance at the same time"
+            )
         elif distance is not None:
             if not isinstance(distance, (int, float)):
                 raise TypeError("distance must be int, float or None")
-            veldist = 0
+            parameter, value = Parameter.distance, distance
         elif velocity is not None:
             if not isinstance(velocity, (int, float)):
                 raise TypeError("distance must be int, float or None")
-            veldist = 1
-        else:
-            veldist = -1
+            parameter, value = Parameter.velocity, velocity
 
         payload = {
-            "coordinate": coordinate_system.value,
-            "alfa": alpha,
-            "delta": delta,
-            "cone": cone,
-            "dist_t": "" if distance is None else distance,
-            "vel_t": "" if velocity is None else velocity,
-            "veldist": veldist}
+            "coordinate": [float(alpha), float(delta)],
+            "system": coordinate_system.value,
+            "parameter": parameter.value,
+            "value": float(value),
+        }
 
         # start the cache orchestration
-        base = (coordinate_system.value,)
+        base = (
+            self.CALCULATOR,
+            coordinate_system.value,
+        )
         key = dcache.core.args_to_key(
-            base=base, args=(self.url,), kwargs=payload, typed=False)
+            base=base, args=(self.URL,), kwargs=payload, typed=False
+        )
 
         with self.cache as cache:
             cache.expire()
             response = cache.get(key, default=dcache.core.ENOVAL, retry=True)
             if response == dcache.core.ENOVAL:
-                response = self.session.post(self.url, payload, **post_kwargs)
+                response = self.session.get(
+                    self.URL, json=payload, **get_kwargs
+                )
                 response.raise_for_status()
                 cache.set(
-                    key, response, expire=self.cache_expire,
-                    tag="@".join(key[:2]), retry=True)
-
-        parsed_response = pq.PyQuery(response.text)
+                    key,
+                    response,
+                    expire=self.cache_expire,
+                    tag="@".join(key[:2]),
+                    retry=True,
+                )
 
         result = Result(
-            coordinate=coordinate_system, alpha=alpha, delta=delta, cone=cone,
-            distance=distance, velocity=velocity,
-            response_=response, d_=parsed_response)
+            calculator=self.CALCULATOR,
+            url=self.URL,
+            coordinate=coordinate_system,
+            search_by=parameter,
+            alpha=alpha,
+            delta=delta,
+            distance=distance,
+            velocity=velocity,
+            response_=response,
+        )
 
         return result
 
-    # =========================================================================
-    # PUBLIC API
-    # =========================================================================
+    def equatorial_search(
+        self,
+        ra=187.78917,
+        dec=13.33386,
+        distance=None,
+        velocity=None,
+        **get_kwargs,
+    ):
+        """Search by equatorial coordinates.
 
-    def equatorial_search(self, ra=187.78917, dec=13.33386, cone=10.0,
-                          distance=None, velocity=None, **post_kwargs):
-        """Search around the sky position expressed in equatorial coordinates
-        (J2000 as 360° decimal) in degrees.
+        The coordinates are expressed in J2000 as 360° decimal.
 
         Parameters
         ----------
-
         ra : ``int`` or ``float`` (default: ``187.78917``)
             Right ascension.
         dec : ``int`` or ``float`` (default: ``13.33386``)
             Declination. dec must be >= -90 and <= 90
-        cone : ``int`` or ``float`` (default: ``10``)
-            Points within this cone angle. cone must be >= 0.
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model distance(s) in Mpc - potentially more than one value.
-        post_kwargs:
-            Optional arguments that ``request.post`` takes.
+        get_kwargs:
+            Optional arguments that ``request.get`` takes.
 
         Returns
         -------
-
         pycf3.Result :
             Result object that automatically parses the entire model
-            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+            returned by the remote calculator.
 
         """
         response = self._search(
-            CoordinateSystem.equatorial, alpha=ra, delta=dec, cone=cone,
-            distance=distance, velocity=velocity, **post_kwargs)
+            CoordinateSystem.equatorial,
+            alpha=ra,
+            delta=dec,
+            distance=distance,
+            velocity=velocity,
+            **get_kwargs,
+        )
         return response
 
-    def galactic_search(self, glon=282.96547, glat=75.41360, cone=10.0,
-                        distance=None, velocity=None, **post_kwargs):
-        """Search around the sky position expressed in galactic coordinates
-        (J2000 as 360° decimal) in degrees.
+    def galactic_search(
+        self,
+        glon=282.96547,
+        glat=75.41360,
+        distance=None,
+        velocity=None,
+        **get_kwargs,
+    ):
+        """Search by galactic coordinates.
+
+        The coordinates are expressed in J2000 as 360° decimal.
 
         Parameters
         ----------
-
         glon : ``int`` or ``float`` (default: ``282.96547``)
             Galactic longitude.
         glat: ``int`` or ``float`` (default: ``75.41360``)
             Galactic latitude. dec must be >= -90 and <= 90
-        cone : ``int`` or ``float`` (default: ``10``)
-            Points within this cone angle. cone must be >= 0.
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model distance(s) in Mpc - potentially more than one value.
-        post_kwargs:
-            Optional arguments that ``request.post`` takes.
+        get_kwargs:
+            Optional arguments that ``request.get`` takes.
 
         Returns
         -------
-
         pycf3.Result :
             Result object that automatically parses the entire model
-            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+            returned by the remote calculator.
 
         """
         response = self._search(
-            CoordinateSystem.galactic, alpha=glon, delta=glat, cone=cone,
-            distance=distance, velocity=velocity, **post_kwargs)
+            CoordinateSystem.galactic,
+            alpha=glon,
+            delta=glat,
+            distance=distance,
+            velocity=velocity,
+            **get_kwargs,
+        )
         return response
 
-    def supergalactic_search(self, sgl=102.0, sgb=-2.0, cone=10.0,
-                             distance=None, velocity=None, **post_kwargs):
-        """Search around the sky position expressed in super-galactic
-        coordinates (J2000 as 360° decimal) in degrees.
+    def supergalactic_search(
+        self,
+        sgl=102.0,
+        sgb=-2.0,
+        distance=None,
+        velocity=None,
+        **get_kwargs,
+    ):
+        """Search super-galactic coordinates.
+
+        The coordinates are expressed in J2000 as 360° decimal.
 
         Parameters
         ----------
-
         sgl : ``int`` or ``float`` (default: ``102``)
             Super-galactic longitude.
         sgb: ``int`` or ``float`` (default: ``-2``)
             Super-galactic latitude. dec must be >= -90 and <= 90
-        cone : ``int`` or ``float`` (default: ``10``)
-            Points within this cone angle. cone must be >= 0.
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model velocity in km/s.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
             Returns model distance(s) in Mpc - potentially more than one value.
-        post_kwargs:
-            Optional arguments that ``request.post`` takes.
+        get_kwargs:
+            Optional arguments that ``request.get`` takes.
 
         Returns
         -------
-
         pycf3.Result :
             Result object that automatically parses the entire model
-            returned by the *Cosmicflows-3 Distance-Velocity Calculator*.
+            returned by the remote calculator.
 
         """
         response = self._search(
-            CoordinateSystem.supergalactic, alpha=sgl, delta=sgb, cone=cone,
-            distance=distance, velocity=velocity, **post_kwargs)
+            CoordinateSystem.supergalactic,
+            alpha=sgl,
+            delta=sgb,
+            distance=distance,
+            velocity=velocity,
+            **get_kwargs,
+        )
         return response
+
+
+# =============================================================================
+# CF3 CLIENT
+# =============================================================================
+
+
+class CF3(AbstractClient):
+    """Client for the *Cosmicflows-3 Distance-Velocity Calculator* [1]_.
+
+    It computes expectation distances or velocities based on smoothed
+    velocity field from the Wiener filter model of Graziani et al. 2019 [2]_.
+
+    More information: http://edd.ifa.hawaii.edu/CF3calculator/ .
+
+    References
+    ----------
+    .. [1] Kourkchi, E., Courtois, H. M., Graziani, R., Hoffman, Y.,
+       Pomarede, D., Shaya, E. J., & Tully, R. B. (2020).
+       Cosmicflows-3: Two Distance-Velocity Calculators.
+       The Astronomical Journal, 159(2), 67.
+
+    .. [2] Graziani, R., Courtois, H. M., Lavaux, G., Hoffman, Y.,
+       Tully, R. B., Copin, Y., & Pomarède, D. (2019).
+       The peculiar velocity field up to z∼ 0.05 by forward-modelling
+       Cosmicflows-3 data. Monthly Notices of the Royal Astronomical Society,
+       488(4), 5438-5451.
+
+    """
+
+    CALCULATOR = "CF3"
+    URL = "http://edd.ifa.hawaii.edu/CF3calculator/api.php"

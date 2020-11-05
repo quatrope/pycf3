@@ -1,0 +1,9 @@
+include LICENSE
+include README.rst
+include CODE_OF_CONDUCT.md
+
+recursive-exclude tests *
+recursive-exclude docs *
+
+exclude tox.ini
+exclude pyproject.toml

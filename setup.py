@@ -23,9 +23,10 @@ import os
 import pathlib
 
 from ez_setup import use_setuptools
+
 use_setuptools()
 
-from setuptools import setup
+from setuptools import setup  # noqa
 
 
 # =============================================================================
@@ -34,25 +35,32 @@ from setuptools import setup
 
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
-REQUIREMENTS = ["numpy", "requests", "attrs", "bokeh", "pyquery", "diskcache"]
+REQUIREMENTS = ["numpy", "requests", "attrs", "diskcache", "custom_inherit"]
 
 with open(PATH / "README.rst") as fp:
     LONG_DESCRIPTION = fp.read()
 
 DESCRIPTION = [
-    line for line in
-    LONG_DESCRIPTION.split("Description\n-----------", 1)[-1].splitlines()
-    if line.strip()][0]
+    line
+    for line in LONG_DESCRIPTION.split("Description\n-----------", 1)[
+        -1
+    ].splitlines()
+    if line.strip()
+][0]
 
 with open(PATH / "pycf3.py") as fp:
-    VERSION = [
-        l for l in fp.readlines() if l.startswith("__version__")
-    ][0].split("=", 1)[-1].strip().replace('"', "")
+    VERSION = (
+        [line for line in fp.readlines() if line.startswith("__version__")][0]
+        .split("=", 1)[-1]
+        .strip()
+        .replace('"', "")
+    )
 
 
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
+
 
 def do_setup():
     setup(
@@ -65,7 +73,12 @@ def do_setup():
         url="https://github.com/quatrope/pycf3",
         license="3 Clause BSD",
         keywords=[
-            "astronomy", "cosmicflow", "Distance", "Velocity", "calculator"],
+            "astronomy",
+            "cosmicflow",
+            "Distance",
+            "Velocity",
+            "calculator",
+        ],
         classifiers=(
             "Development Status :: 4 - Beta",
             "Intended Audience :: Education",
@@ -73,11 +86,13 @@ def do_setup():
             "License :: OSI Approved :: BSD License",
             "Operating System :: OS Independent",
             "Programming Language :: Python",
-            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3",
             "Programming Language :: Python :: Implementation :: CPython",
-            "Topic :: Scientific/Engineering"),
+            "Topic :: Scientific/Engineering",
+        ),
         py_modules=["pycf3", "ez_setup"],
-        install_requires=REQUIREMENTS)
+        install_requires=REQUIREMENTS,
+    )
 
 
 if __name__ == "__main__":
