@@ -39,9 +39,7 @@ def test_equatorial_search_distance_10(cf3_no_cache, load_mresponse):
 
     mresponse = load_mresponse("cf3", "tcEquatorial_distance_10.pkl")
     with mock.patch("requests.Session.get", return_value=mresponse):
-        result = cf3.calculate_distance(
-            ra=187.78917, dec=13.33386, distance=10
-        )
+        result = cf3.equatorial_search(distance=10)
 
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
@@ -78,8 +76,7 @@ def test_equatorial_search_velocity_10(cf3_no_cache, load_mresponse):
 
     mresponse = load_mresponse("cf3", "tcEquatorial_velocity_10.pkl")
     with mock.patch("requests.Session.get", return_value=mresponse):
-        with pytest.deprecated_call():
-            result = cf3.equatorial_search(velocity=10)
+        result = cf3.equatorial_search(velocity=10)
 
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
@@ -110,50 +107,43 @@ def test_equatorial_search_velocity_10(cf3_no_cache, load_mresponse):
 def test_equatorial_search_ra_not_number(cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(TypeError):
-        with pytest.deprecated_call():
-            cf3.equatorial_search(ra="foo")
+        cf3.equatorial_search(ra="foo")
 
 
 def test_equatorial_search_dec_not_number(cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(TypeError):
-        with pytest.deprecated_call():
-            cf3.equatorial_search(dec="foo")
+        cf3.equatorial_search(dec="foo")
 
 
 def test_equatorial_search_dec_lt_m90(cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(ValueError):
-        with pytest.deprecated_call():
-            cf3.equatorial_search(dec=-91)
+        cf3.equatorial_search(dec=-91)
 
 
 def test_equatorial_search_dec_gt_90(cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(ValueError):
-        with pytest.deprecated_call():
-            cf3.equatorial_search(dec=91)
+        cf3.equatorial_search(dec=91)
 
 
 def test_equatorial_search_distance_velocity_together(cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(ValueError):
-        with pytest.deprecated_call():
-            cf3.equatorial_search(distance=10, velocity=10)
+        cf3.equatorial_search(distance=10, velocity=10)
 
 
 def test_equatorial_search_distance_not_number(cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(TypeError):
-        with pytest.deprecated_call():
-            cf3.equatorial_search(distance="foo")
+        cf3.equatorial_search(distance="foo")
 
 
 def test_equatorial_search_velocity_not_number(cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(TypeError):
-        with pytest.deprecated_call():
-            cf3.equatorial_search(distance="foo")
+        cf3.equatorial_search(distance="foo")
 
 
 # =============================================================================
@@ -166,8 +156,7 @@ def test_galactic_search_distance_10(cf3_no_cache, load_mresponse):
 
     mresponse = load_mresponse("cf3", "tcGalactic_distance_10.pkl")
     with mock.patch("requests.Session.get", return_value=mresponse):
-        with pytest.deprecated_call():
-            result = cf3.galactic_search(distance=10)
+        result = cf3.galactic_search(distance=10)
 
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
