@@ -39,7 +39,8 @@ def test_equatorial_search_distance_10(cf3_no_cache, load_mresponse):
 
     mresponse = load_mresponse("cf3", "tcEquatorial_distance_10.pkl")
     with mock.patch("requests.Session.get", return_value=mresponse):
-        result = cf3.equatorial_search(distance=10)
+        with pytest.deprecated_call():
+            result = cf3.equatorial_search(distance=10)
 
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
