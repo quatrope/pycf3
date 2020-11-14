@@ -289,3 +289,27 @@ def test_calculate_velocity_distance_not_number(params, cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(TypeError):
         cf3.calculate_velocity(distance="foo", **params)
+
+
+@pytest.mark.parametrize("alpha", pycf3.ALPHA.items())
+@pytest.mark.parametrize("delta", pycf3.DELTA.items())
+def test_calculate_velocity_mix_coordinate_system(alpha, delta, cf3_no_cache):
+    alpha_system, alpha_name = alpha
+    delta_system, delta_name = delta
+    if alpha_system != delta_system:
+        params = {alpha_name: 1, delta_name: 1}
+        cf3 = cf3_no_cache
+        with pytest.raises(pycf3.MixedCoordinateSystem):
+            cf3.calculate_velocity(distance=10, **params)
+
+
+@pytest.mark.parametrize("alpha", pycf3.ALPHA.items())
+@pytest.mark.parametrize("delta", pycf3.DELTA.items())
+def test_calculate_distance_mix_coordinate_system(alpha, delta, cf3_no_cache):
+    alpha_system, alpha_name = alpha
+    delta_system, delta_name = delta
+    if alpha_system != delta_system:
+        params = {alpha_name: 1, delta_name: 1}
+        cf3 = cf3_no_cache
+        with pytest.raises(pycf3.MixedCoordinateSystem):
+            cf3.calculate_distance(velocity=10, **params)
