@@ -20,6 +20,7 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 # IMPORTS
 # =============================================================================
 
+import itertools as it
 from unittest import mock
 
 from numpy import testing as npt
@@ -27,6 +28,12 @@ from numpy import testing as npt
 import pycf3
 
 import pytest
+
+# =============================================================================
+# MARKERS
+# =============================================================================
+
+pytestmark = [pytest.mark.xfail]
 
 
 # =============================================================================
@@ -259,8 +266,36 @@ def test_sgalactic_calculate_distance_vel_EQ_10(cf3_no_cache, load_mresponse):
 
 
 # =============================================================================
-# FAILS
+# calculate_distance with NAN 0 or -
 # =============================================================================
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": 187.78917, "dec": 13.33386},
+        {"glon": 282.96547, "glat": 75.4136},
+        {"sgl": 102.0, "sgb": -2.0},
+    ],
+)
+def test_calculate_distance_velocity_eq_0(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(ValueError):
+        cf3.calculate_distance(velocity=0, **params)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": 187.78917, "dec": 13.33386},
+        {"glon": 282.96547, "glat": 75.4136},
+        {"sgl": 102.0, "sgb": -2.0},
+    ],
+)
+def test_calculate_distance_velocity_lt_0(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(ValueError):
+        cf3.calculate_distance(velocity=-1, **params)
 
 
 @pytest.mark.parametrize(
@@ -274,7 +309,101 @@ def test_sgalactic_calculate_distance_vel_EQ_10(cf3_no_cache, load_mresponse):
 def test_calculate_distance_velocity_not_number(params, cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(TypeError):
-        cf3.calculate_distance(velocity="foo", **params)
+        cf3.calculate_distance(velocity="invalid", **params)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": 187.78917, "dec": "invalid"},
+        {"glon": 282.96547, "glat": "invalid"},
+        {"sgl": 102.0, "sgb": "invalid"},
+    ],
+)
+def test_calculate_distance_delta_not_number(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(TypeError):
+        cf3.calculate_distance(velocity="invalid", **params)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": "invalid", "dec": 13.33386},
+        {"glon": "invalid", "glat": 75.4136},
+        {"sgl": "invalid", "sgb": -2.0},
+    ],
+)
+def test_calculate_distance_alpha_not_number(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(TypeError):
+        cf3.calculate_distance(velocity=10, **params)
+
+
+# =============================================================================
+# calculate_distance BAD COORDINATES
+# =============================================================================
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": 91, "dec": 13.33386},
+        {"glon": 91, "glat": 75.4136},
+        {"sgl": 91, "sgb": -2.0},
+    ],
+)
+def test_calculate_distance_alpha_gt_90(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(ValueError):
+        cf3.calculate_distance(velocity=10 ** params)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": -91, "dec": 13.33386},
+        {"glon": -91, "glat": 75.4136},
+        {"sgl": -91, "sgb": -2.0},
+    ],
+)
+def test_calculate_distance_alpha_lt_m90(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(ValueError):
+        cf3.calculate_distance(velocity=10 ** params)
+
+
+# =============================================================================
+# calculate_velocity with NAN 0 or -
+# =============================================================================
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": 187.78917, "dec": 13.33386},
+        {"glon": 282.96547, "glat": 75.4136},
+        {"sgl": 102.0, "sgb": -2.0},
+    ],
+)
+def test_calculate_velocity_distance_eq_0(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(ValueError):
+        cf3.calculate_velocity(distance=0, **params)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": 187.78917, "dec": 13.33386},
+        {"glon": 282.96547, "glat": 75.4136},
+        {"sgl": 102.0, "sgb": -2.0},
+    ],
+)
+def test_calculate_velocity_distance_lt_0(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(ValueError):
+        cf3.calculate_velocity(distance=-1, **params)
 
 
 @pytest.mark.parametrize(
@@ -288,28 +417,95 @@ def test_calculate_distance_velocity_not_number(params, cf3_no_cache):
 def test_calculate_velocity_distance_not_number(params, cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(TypeError):
-        cf3.calculate_velocity(distance="foo", **params)
+        cf3.calculate_velocity(distance="invalid", **params)
 
 
-@pytest.mark.parametrize("alpha", pycf3.ALPHA.items())
-@pytest.mark.parametrize("delta", pycf3.DELTA.items())
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": "invalid", "dec": 13.33386},
+        {"glon": "invalid", "glat": 75.4136},
+        {"sgl": "invalid", "sgb": -2.0},
+    ],
+)
+def test_calculate_velocity_alpha_not_number(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(TypeError):
+        cf3.calculate_velocity(distance=10, **params)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": 187.78917, "dec": "invalid"},
+        {"glon": 282.96547, "glat": "invalid"},
+        {"sgl": 102.0, "sgb": "invalid"},
+    ],
+)
+def test_calculate_velocity_delta_not_number(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(TypeError):
+        cf3.calculate_velocity(distance=10, **params)
+
+
+# =============================================================================
+# calculate_velocity BAD COORDINATES
+# =============================================================================
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": 91, "dec": 13.33386},
+        {"glon": 91, "glat": 75.4136},
+        {"sgl": 91, "sgb": -2.0},
+    ],
+)
+def test_calculate_velocity_alpha_gt_90(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(ValueError):
+        cf3.calculate_velocity(distance=10, **params)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"ra": -91, "dec": 13.33386},
+        {"glon": -91, "glat": 75.4136},
+        {"sgl": -91, "sgb": -2.0},
+    ],
+)
+def test_calculate_velocity_alpha_lt_m90(params, cf3_no_cache):
+    cf3 = cf3_no_cache
+    with pytest.raises(ValueError):
+        cf3.calculate_velocity(distance=10, **params)
+
+
+# =============================================================================
+# MIX COORDINATES
+# =============================================================================
+
+
+def mix_coordinates():
+    for alpha, delta in it.product(pycf3.ALPHA.items(), pycf3.DELTA.items()):
+        alpha_system, alpha_name = alpha
+        delta_system, delta_name = delta
+        if alpha_system != delta_system:
+            yield alpha_name, delta_name
+
+
+@pytest.mark.parametrize("alpha, delta", mix_coordinates())
 def test_calculate_velocity_mix_coordinate_system(alpha, delta, cf3_no_cache):
-    alpha_system, alpha_name = alpha
-    delta_system, delta_name = delta
-    if alpha_system != delta_system:
-        params = {alpha_name: 1, delta_name: 1}
-        cf3 = cf3_no_cache
-        with pytest.raises(pycf3.MixedCoordinateSystem):
-            cf3.calculate_velocity(distance=10, **params)
+    cf3 = cf3_no_cache
+    params = {alpha: 1, delta: 1}
+    print(params)
+    with pytest.raises(pycf3.MixedCoordinateSystem):
+        cf3.calculate_velocity(distance=10, **params)
 
 
-@pytest.mark.parametrize("alpha", pycf3.ALPHA.items())
-@pytest.mark.parametrize("delta", pycf3.DELTA.items())
+@pytest.mark.parametrize("alpha, delta", mix_coordinates())
 def test_calculate_distance_mix_coordinate_system(alpha, delta, cf3_no_cache):
-    alpha_system, alpha_name = alpha
-    delta_system, delta_name = delta
-    if alpha_system != delta_system:
-        params = {alpha_name: 1, delta_name: 1}
-        cf3 = cf3_no_cache
-        with pytest.raises(pycf3.MixedCoordinateSystem):
-            cf3.calculate_distance(velocity=10, **params)
+    cf3 = cf3_no_cache
+    params = {alpha: 1, delta: 1}
+    with pytest.raises(pycf3.MixedCoordinateSystem):
+        cf3.calculate_distance(velocity=10, **params)
