@@ -499,7 +499,7 @@ def test_calculate_velocity_mix_coordinate_system(alpha, delta, cf3_no_cache):
     cf3 = cf3_no_cache
     params = {alpha: 1, delta: 1}
     print(params)
-    with pytest.raises(pycf3.MixedCoordinateSystem):
+    with pytest.raises(pycf3.MixedCoordinateSystemError):
         cf3.calculate_velocity(distance=10, **params)
 
 
@@ -507,5 +507,33 @@ def test_calculate_velocity_mix_coordinate_system(alpha, delta, cf3_no_cache):
 def test_calculate_distance_mix_coordinate_system(alpha, delta, cf3_no_cache):
     cf3 = cf3_no_cache
     params = {alpha: 1, delta: 1}
-    with pytest.raises(pycf3.MixedCoordinateSystem):
+    with pytest.raises(pycf3.MixedCoordinateSystemError):
+        cf3.calculate_distance(velocity=10, **params)
+
+
+def test_calculate_velocity_multiple_alpha(cf3_no_cache):
+    cf3 = cf3_no_cache
+    params = {"ra": 1, "dec": 1, "glon": 1}
+    with pytest.raises(pycf3.MixedCoordinateSystemError):
+        cf3.calculate_velocity(distance=10, **params)
+
+
+def test_calculate_velocity_multiple_delta(cf3_no_cache):
+    cf3 = cf3_no_cache
+    params = {"ra": 1, "dec": 1, "glat": 1}
+    with pytest.raises(pycf3.MixedCoordinateSystemError):
+        cf3.calculate_velocity(distance=10, **params)
+
+
+def test_calculate_distance_multiple_alpha(cf3_no_cache):
+    cf3 = cf3_no_cache
+    params = {"ra": 1, "dec": 1, "glon": 1}
+    with pytest.raises(pycf3.MixedCoordinateSystemError):
+        cf3.calculate_distance(velocity=10, **params)
+
+
+def test_calculate_distance_multiple_delta(cf3_no_cache):
+    cf3 = cf3_no_cache
+    params = {"ra": 1, "dec": 1, "glat": 1}
+    with pytest.raises(pycf3.MixedCoordinateSystemError):
         cf3.calculate_distance(velocity=10, **params)
