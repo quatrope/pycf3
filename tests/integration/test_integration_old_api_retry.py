@@ -34,7 +34,7 @@ import requests
 # MARKERS
 # =============================================================================
 
-pytestmark = [pytest.mark.integration, pytest.mark.xfail]
+pytestmark = [pytest.mark.integration]
 
 
 # =============================================================================
@@ -58,7 +58,7 @@ def test_integration_timeout(cf3_temp_cache, monkeypatch):
     cf3 = cf3_temp_cache
 
     t0 = time.time()
-    with pytest.raises(requests.ConnectionError):
+    with pytest.raises(requests.ConnectionError), pytest.deprecated_call():
         cf3.equatorial_search(distance=10, timeout=2)
     total_time = time.time() - t0
 
@@ -71,4 +71,5 @@ def test_integration_http_status_500(cf3_temp_cache, monkeypatch):
     cf3 = cf3_temp_cache
 
     with pytest.raises(requests.exceptions.RetryError):
-        cf3.equatorial_search(distance=10)
+        with pytest.deprecated_call():
+            cf3.equatorial_search(distance=10)

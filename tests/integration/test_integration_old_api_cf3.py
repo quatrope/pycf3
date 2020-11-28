@@ -37,7 +37,7 @@ import pytest
 # MARKERS
 # =============================================================================
 
-pytestmark = [pytest.mark.integration, pytest.mark.xfail]
+pytestmark = [pytest.mark.integration]
 
 
 # =============================================================================
@@ -60,7 +60,8 @@ def test_integration_equatorial_search(cf3_temp_cache):
 
     assert len(cf3.cache) == 0
 
-    result = cf3.equatorial_search(distance=10)
+    with pytest.deprecated_call():
+        result = cf3.equatorial_search(distance=10)
 
     assert len(cf3.cache) == 1
 
@@ -91,10 +92,12 @@ def test_integration_equatorial_search(cf3_temp_cache):
     npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
     npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
-    cf3.equatorial_search(distance=10)
+    with pytest.deprecated_call():
+        cf3.equatorial_search(distance=10)
     assert len(cf3.cache) == 1
 
-    cf3.equatorial_search(distance=11)
+    with pytest.deprecated_call():
+        cf3.equatorial_search(distance=11)
     assert len(cf3.cache) == 2
 
 
@@ -108,7 +111,8 @@ def test_integration_galactic_search(cf3_temp_cache):
 
     assert len(cf3.cache) == 0
 
-    result = cf3.galactic_search(distance=10)
+    with pytest.deprecated_call():
+        result = cf3.galactic_search(distance=10)
 
     assert len(cf3.cache) == 1
 
@@ -137,10 +141,12 @@ def test_integration_galactic_search(cf3_temp_cache):
     npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
     npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
-    cf3.galactic_search(distance=10)
+    with pytest.deprecated_call():
+        cf3.galactic_search(distance=10)
     assert len(cf3.cache) == 1
 
-    cf3.galactic_search(distance=11)
+    with pytest.deprecated_call():
+        cf3.galactic_search(distance=11)
     assert len(cf3.cache) == 2
 
 
@@ -154,7 +160,8 @@ def test_integration_supergalactic_search(cf3_temp_cache):
 
     assert len(cf3.cache) == 0
 
-    result = cf3.supergalactic_search(distance=10)
+    with pytest.deprecated_call():
+        result = cf3.supergalactic_search(distance=10)
 
     assert len(cf3.cache) == 1
 
@@ -183,8 +190,10 @@ def test_integration_supergalactic_search(cf3_temp_cache):
     npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
     npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
-    cf3.supergalactic_search(distance=10)
+    with pytest.deprecated_call():
+        cf3.supergalactic_search(distance=10)
     assert len(cf3.cache) == 1
 
-    cf3.supergalactic_search(distance=11)
+    with pytest.deprecated_call():
+        cf3.supergalactic_search(distance=11)
     assert len(cf3.cache) == 2

@@ -44,6 +44,8 @@ import attr
 
 from custom_inherit import DocInheritMeta
 
+from deprecated import deprecated
+
 import diskcache as dcache
 
 import numpy as np
@@ -86,6 +88,15 @@ PYCF3_DATA = os.path.expanduser(os.path.join("~", "pycf3_data"))
 
 
 DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
+
+# ===============================================================================
+# EXCEPTION
+# ===============================================================================
+
+
+class CFDeprecated(DeprecationWarning):
+    """Custom class to inform that some funcionality is in desuse."""
+
 
 # =============================================================================
 # RETRY SESSION IMPLEMENTATION
@@ -426,6 +437,11 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
         return result
 
+    @deprecated(
+        category=CFDeprecated,
+        action="default",
+        reason="Use `calulate_velocity` or `calculate_distance` instead",
+    )
     def equatorial_search(
         self,
         ra=187.78917,
@@ -468,6 +484,11 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         )
         return response
 
+    @deprecated(
+        category=CFDeprecated,
+        action="default",
+        reason="Use `calulate_velocity` or `calculate_distance` instead",
+    )
     def galactic_search(
         self,
         glon=282.96547,
@@ -510,6 +531,11 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         )
         return response
 
+    @deprecated(
+        category=CFDeprecated,
+        action="default",
+        reason="Use `calulate_velocity` or `calculate_distance` instead",
+    )
     def supergalactic_search(
         self,
         sgl=102.0,

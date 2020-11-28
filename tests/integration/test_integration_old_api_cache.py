@@ -32,7 +32,7 @@ import pytest
 # MARKERS
 # =============================================================================
 
-pytestmark = [pytest.mark.integration, pytest.mark.xfail]
+pytestmark = [pytest.mark.integration]
 
 
 # =============================================================================
@@ -56,8 +56,9 @@ def test_integration_cache(tmp_cache):
 
     assert len(cache) == 0
 
-    cf3.equatorial_search(velocity=10)
-    cf3.equatorial_search(velocity=10)
+    with pytest.deprecated_call():
+        cf3.equatorial_search(velocity=10)
+        cf3.equatorial_search(velocity=10)
 
     assert len(cache) == 1
 
@@ -69,8 +70,9 @@ def test_integration_no_cache(no_cache):
 
     assert len(cache) == 0
 
-    cf3.equatorial_search(velocity=10)
-    cf3.equatorial_search(velocity=10)
+    with pytest.deprecated_call():
+        cf3.equatorial_search(velocity=10)
+        cf3.equatorial_search(velocity=10)
 
     assert len(cache) == 0
 
@@ -82,12 +84,14 @@ def test_integration_cache_expire(tmp_cache):
 
     assert len(cache) == 0
 
-    cf3.equatorial_search(distance=10)
+    with pytest.deprecated_call():
+        cf3.equatorial_search(distance=10)
 
     assert len(cache) == 1
 
     time.sleep(3)
 
-    cf3.equatorial_search(distance=10)
+    with pytest.deprecated_call():
+        cf3.equatorial_search(distance=10)
 
     assert len(cache) == 1

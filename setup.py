@@ -35,7 +35,14 @@ from setuptools import setup  # noqa
 
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
-REQUIREMENTS = ["numpy", "requests", "attrs", "diskcache", "custom_inherit"]
+REQUIREMENTS = [
+    "numpy",
+    "requests",
+    "attrs",
+    "diskcache",
+    "custom_inherit",
+    "Deprecated",
+]
 
 with open(PATH / "README.rst") as fp:
     LONG_DESCRIPTION = fp.read()
