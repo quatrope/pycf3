@@ -25,7 +25,14 @@ For citation check:
 """
 
 
-__all__ = ["CF3", "Result", "NoCache", "RetrySession"]
+__all__ = [
+    "DeprecationWarning",
+    "MixedCoordinateSystemError",
+    "CF3",
+    "Result",
+    "NoCache",
+    "RetrySession",
+]
 
 __version__ = "2020.11b"
 
@@ -34,6 +41,7 @@ __version__ = "2020.11b"
 # IMPORTS
 # =============================================================================
 
+import itertools as it
 import os
 import typing as t
 from collections import namedtuple
@@ -76,6 +84,7 @@ ALPHA = {
     CoordinateSystem.supergalactic: "sgl",
 }
 
+ALPHA_TO_COORDINATE = {v: k for k, v in ALPHA.items()}
 
 DELTA = {
     CoordinateSystem.equatorial: "dec",
@@ -83,6 +92,11 @@ DELTA = {
     CoordinateSystem.supergalactic: "sgb",
 }
 
+DELTA_TO_COORDINATE = {v: k for k, v in DELTA.items()}
+
+ALPHA_DELTA_TO_COORDINATE = dict(
+    it.chain(ALPHA_TO_COORDINATE.items(), DELTA_TO_COORDINATE.items())
+)
 
 PYCF3_DATA = os.path.expanduser(os.path.join("~", "pycf3_data"))
 
@@ -90,8 +104,12 @@ PYCF3_DATA = os.path.expanduser(os.path.join("~", "pycf3_data"))
 DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
 
 # ===============================================================================
-# EXCEPTION
+# EXCEPTIONS
 # ===============================================================================
+
+
+class MixedCoordinateSystemError(ValueError):
+    """Raised when the parameters are 0from different coordinates systems."""
 
 
 class CFDeprecated(DeprecationWarning):
@@ -347,13 +365,73 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
     def _cache_default(self):
         return dcache.Cache(directory=DEFAULT_CACHE_DIR)
 
+    def _determine_coordinate_system(self, ra, dec, glon, glat, sgl, sgb):
+
+        # first we put all the parameters ina single
+        # dictionaty
+        params = {
+            "ra": ra,
+            "dec": dec,
+            "glon": glon,
+            "glat": glat,
+            "sgl": sgl,
+            "sgb": sgb,
+        }
+
+        # next we remove all with the default None value
+        params = {k: v for k, v in params.items() if v is not None}
+
+        # if we have 0 values no coordinate was given
+        if len(params) == 0:
+            raise ValueError(
+                "No coordinate was provided. "
+                "Please provide (ra, dec)', '(glon, glat)' or '(sgl, sgb)'."
+            )
+
+        # if we only have one we need to check wich one and inform about
+        # the mising companinon
+        if len(params) == 1:
+            pname = params.keys()[0]
+            coordinate_system, companion_dict = (
+                (ALPHA_TO_COORDINATE[pname], DELTA)
+                if pname in ALPHA_TO_COORDINATE
+                else (DELTA_TO_COORDINATE[pname], ALPHA)
+            )
+            companion = companion_dict[coordinate_system]
+            raise ValueError(f"No {companion} provided")
+
+        # if we have more than two parameter we have mixed coordinate sistem
+        if len(params) > 2:
+            # first we split the parameters by coordinate_system
+            raise MixedCoordinateSystemError(", ".join(params))
+
+        # now we need to detemine the coordinate system
+        coordinate_system_candidates = {
+            ALPHA_DELTA_TO_COORDINATE[p] for p in params.keys()
+        }
+
+        # is we have more than 1 candidate we mix coordinates again
+        if len(coordinate_system_candidates) > 1:
+            raise MixedCoordinateSystemError(", ".join(params))
+
+        # we have one coordinate system and we need to dermermine which
+        # is alpha and wich is delta
+        coordinate_system = coordinate_system_candidates.pop()
+        alpha_coordinate_name = ALPHA[coordinate_system]
+        delta_coordinate_name = DELTA[coordinate_system]
+
+        alpha = params[alpha_coordinate_name]
+        delta = params[delta_coordinate_name]
+
+        return coordinate_system, alpha, delta
+
     def _search(
         self,
         coordinate_system,
         alpha,
         delta,
-        distance=None,
-        velocity=None,
+        distance,
+        velocity,
         **get_kwargs,
     ):
 
@@ -374,6 +452,8 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
                 f"{DELTA[coordinate_system]} must be >= -90 and <= 90"
             )
 
+        # ESTE FRAGMENTO DE CODIGO PUEDE SER ELIMINADO AL DEPRECAR EL API
+        # DESDE ===============================================================
         if (distance, velocity) == (None, None):
             raise ValueError(
                 "You must provide the distance or the velocity value"
@@ -382,13 +462,21 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
             raise ValueError(
                 "You cant provide velocity and distance at the same time"
             )
-        elif distance is not None:
+        # HASTA ===============================================================
+
+        if distance is not None:
             if not isinstance(distance, (int, float)):
-                raise TypeError("distance must be int, float or None")
+                raise TypeError("'distance' must be int or float")
+            elif not (0 < distance <= 200):
+                raise ValueError("'distance' must be > 0 and <= 200")
             parameter, value = Parameter.distance, distance
+
         elif velocity is not None:
             if not isinstance(velocity, (int, float)):
-                raise TypeError("distance must be int, float or None")
+                raise TypeError("'velocity' must be int or float")
+            elif not (0 < velocity <= 15_000):
+                raise ValueError("'velocity' must be > 0 and <= 15_000")
+
             parameter, value = Parameter.velocity, velocity
 
         payload = {
@@ -436,6 +524,62 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         )
 
         return result
+
+    # =========================================================================
+    # API
+    # =========================================================================
+
+    def calculate_distance(
+        self,
+        velocity,
+        ra=None,
+        dec=None,
+        glon=None,
+        glat=None,
+        sgl=None,
+        sgb=None,
+        **get_kwargs,
+    ):
+        coordinate_system, alpha, delta = self._determine_coordinate_system(
+            ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb
+        )
+        response = self._search(
+            coordinate_system=coordinate_system,
+            alpha=alpha,
+            delta=delta,
+            distance=None,
+            velocity=velocity,
+            **get_kwargs,
+        )
+        return response
+
+    def calculate_velocity(
+        self,
+        distance,
+        ra=None,
+        dec=None,
+        glon=None,
+        glat=None,
+        sgl=None,
+        sgb=None,
+        **get_kwargs,
+    ):
+        coordinate_system, alpha, delta = self._determine_coordinate_system(
+            ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb
+        )
+        response = self._search(
+            coordinate_system=coordinate_system,
+            alpha=alpha,
+            delta=delta,
+            distance=distance,
+            velocity=None,
+            **get_kwargs,
+        )
+        return response
+
+    # =========================================================================
+    # OLD API
+    # =========================================================================
 
     @deprecated(
         category=CFDeprecated,
