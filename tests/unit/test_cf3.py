@@ -348,31 +348,29 @@ def test_calculate_distance_no_coordinates(cf3_no_cache):
 @pytest.mark.parametrize(
     "params",
     [
-        {"ra": 91, "dec": 13.33386},
-        {"glon": 91, "glat": 75.4136},
-        {"sgl": 91, "sgb": -2.0},
+        {"ra": 1, "dec": 91},
+        {"glon": 1, "glat": 91},
+        {"sgl": 1, "sgb": 91},
     ],
 )
-@pytest.mark.xfail
-def test_calculate_distance_alpha_gt_90(params, cf3_no_cache):
+def test_calculate_distance_delta_gt_90(params, cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(ValueError):
-        cf3.calculate_distance(velocity=10 ** params)
+        cf3.calculate_distance(velocity=10, **params)
 
 
 @pytest.mark.parametrize(
     "params",
     [
-        {"ra": -91, "dec": 13.33386},
-        {"glon": -91, "glat": 75.4136},
-        {"sgl": -91, "sgb": -2.0},
+        {"ra": 1, "dec": -91},
+        {"glon": 1, "glat": -91},
+        {"sgl": 1, "sgb": -91},
     ],
 )
-@pytest.mark.xfail
-def test_calculate_distance_alpha_lt_m90(params, cf3_no_cache):
+def test_calculate_distance_delta_lt_m90(params, cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(ValueError):
-        cf3.calculate_distance(velocity=10 ** params)
+        cf3.calculate_distance(velocity=10, **params)
 
 
 @pytest.mark.parametrize(
@@ -478,13 +476,12 @@ def test_calculate_velocity_no_coordinates(cf3_no_cache):
 @pytest.mark.parametrize(
     "params",
     [
-        {"ra": 91, "dec": 13.33386},
-        {"glon": 91, "glat": 75.4136},
-        {"sgl": 91, "sgb": -2.0},
+        {"ra": 1, "dec": 91},
+        {"glon": 1, "glat": 91},
+        {"sgl": 1, "sgb": 91},
     ],
 )
-@pytest.mark.xfail
-def test_calculate_velocity_alpha_gt_90(params, cf3_no_cache):
+def test_calculate_velocity_delta_gt_90(params, cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(ValueError):
         cf3.calculate_velocity(distance=10, **params)
@@ -493,13 +490,12 @@ def test_calculate_velocity_alpha_gt_90(params, cf3_no_cache):
 @pytest.mark.parametrize(
     "params",
     [
-        {"ra": -91, "dec": 13.33386},
-        {"glon": -91, "glat": 75.4136},
-        {"sgl": -91, "sgb": -2.0},
+        {"ra": 1, "dec": -91},
+        {"glon": 1, "glat": -91},
+        {"sgl": 1, "sgb": -91},
     ],
 )
-@pytest.mark.xfail
-def test_calculate_velocity_alpha_lt_m90(params, cf3_no_cache):
+def test_calculate_velocity_delta_lt_m90(params, cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(ValueError):
         cf3.calculate_velocity(distance=10, **params)

@@ -26,7 +26,7 @@ For citation check:
 
 
 __all__ = [
-    "DeprecationWarning",
+    "CFDeprecationWarning",
     "MixedCoordinateSystemError",
     "CF3",
     "Result",
@@ -112,7 +112,7 @@ class MixedCoordinateSystemError(ValueError):
     """Raised when the parameters are 0from different coordinates systems."""
 
 
-class CFDeprecated(DeprecationWarning):
+class CFDeprecationWarning(DeprecationWarning):
     """Custom class to inform that some funcionality is in desuse."""
 
 
@@ -582,7 +582,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
     # =========================================================================
 
     @deprecated(
-        category=CFDeprecated,
+        category=CFDeprecationWarning,
         action="default",
         reason="Use `calulate_velocity` or `calculate_distance` instead",
     )
@@ -629,7 +629,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         return response
 
     @deprecated(
-        category=CFDeprecated,
+        category=CFDeprecationWarning,
         action="default",
         reason="Use `calulate_velocity` or `calculate_distance` instead",
     )
@@ -676,7 +676,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         return response
 
     @deprecated(
-        category=CFDeprecated,
+        category=CFDeprecationWarning,
         action="default",
         reason="Use `calulate_velocity` or `calculate_distance` instead",
     )
