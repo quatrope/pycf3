@@ -20,7 +20,6 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 # IMPORTS
 # =============================================================================
 
-import itertools as it
 from unittest import mock
 
 from numpy import testing as npt

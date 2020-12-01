@@ -467,15 +467,19 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         if distance is not None:
             if not isinstance(distance, (int, float)):
                 raise TypeError("'distance' must be int or float")
-            elif not (0 < distance <= 200):
-                raise ValueError("'distance' must be > 0 and <= 200")
+            elif not (0 < distance <= self.MAX_DISTANCE):
+                raise ValueError(
+                    f"'distance' must be > 0 and <= {self.MAX_DISTANCE}"
+                )
             parameter, value = Parameter.distance, distance
 
         elif velocity is not None:
             if not isinstance(velocity, (int, float)):
                 raise TypeError("'velocity' must be int or float")
-            elif not (0 < velocity <= 15_000):
-                raise ValueError("'velocity' must be > 0 and <= 15_000")
+            elif not (0 < velocity <= self.MAX_VELOCITY):
+                raise ValueError(
+                    f"'velocity' must be > 0 and <= {self.MAX_VELOCITY}"
+                )
 
             parameter, value = Parameter.velocity, velocity
 
@@ -753,3 +757,6 @@ class CF3(AbstractClient):
 
     CALCULATOR = "CF3"
     URL = "http://edd.ifa.hawaii.edu/CF3calculator/api.php"
+
+    MAX_DISTANCE = 200
+    MAX_VELOCITY = 15_000

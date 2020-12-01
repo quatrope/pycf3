@@ -10,8 +10,8 @@
 # DOCS
 # =============================================================================
 
-"""Test for Python client for Cosmicflows-3 Distance-Velocity Calculator at
-distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
+
+"""Test for Python common functionalities in all CosmicFlow
 
 """
 
@@ -21,9 +21,6 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 # =============================================================================
 
 import itertools as it
-from unittest import mock
-
-from numpy import testing as npt
 
 import pycf3
 

@@ -26,6 +26,8 @@ import diskcache as dcache
 
 import joblib
 
+import numpy as np
+
 import pycf3
 
 import pytest
@@ -72,6 +74,8 @@ def fakeclient_class():
     class Fake(pycf3.AbstractClient):
         CALCULATOR = "fake"
         URL = "nowhere://no.where"
+        MAX_DISTANCE = np.iinfo(int).max
+        MAX_VELOCITY = np.iinfo(int).max
 
     return Fake
 
@@ -90,7 +94,7 @@ def fakeclient_no_cache(fakeclient_class, no_cache):
 
 @pytest.fixture
 def fakeclient_temp_cache(fakeclient_class, tmp_cache):
-    return fakeclient(cache=tmp_cache)
+    return fakeclient_class(cache=tmp_cache)
 
 
 @pytest.fixture
