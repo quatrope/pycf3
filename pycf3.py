@@ -28,6 +28,7 @@ For citation check:
 __all__ = [
     "CFDeprecationWarning",
     "MixedCoordinateSystemError",
+    "NAM",
     "CF3",
     "Result",
     "NoCache",
@@ -515,6 +516,12 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
                     retry=True,
                 )
 
+        import ipdb; ipdb.set_trace()
+
+        # dirp = "/home/juan/proyectos/cf3/src/tests/mock_data/nam"
+        # system = self.coordinate.value
+        # method = self.search_by.value
+        # val = int(self.distance or self.velocity)
         result = Result(
             calculator=self.CALCULATOR,
             url=self.URL,
@@ -754,7 +761,7 @@ class NAM(AbstractClient):
     """
 
     CALCULATOR = "NAM"
-    URL = "http://edd.ifa.hawaii.edu/NAM/api.php"
+    URL = "http://edd.ifa.hawaii.edu/NAMcalculator/api.php"
 
     MAX_DISTANCE = 38
     MAX_VELOCITY = 2400
