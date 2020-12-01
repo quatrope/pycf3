@@ -52,24 +52,31 @@ def teardown_function(function):
 # =============================================================================
 
 
-def test_integration_timeout(cf3_temp_cache, monkeypatch):
-    monkeypatch.setattr(pycf3.CF3, "URL", "http://httpbin.org/delay/10")
+def test_integration_timeout(
+    fakeclient_class, fakeclient_temp_cache, monkeypatch
+):
+    monkeypatch.setattr(fakeclient_class, "URL", "http://httpbin.org/delay/5")
 
-    cf3 = cf3_temp_cache
+    client = fakeclient_temp_cache
 
     t0 = time.time()
-    with pytest.raises(requests.ConnectionError), pytest.deprecated_call():
-        cf3.equatorial_search(distance=10, timeout=2)
+    with pytest.raises(requests.ConnectionError):
+        client.calculate_velocity(
+            ra=187.78917, dec=13.33386, distance=10, timeout=2
+        )
     total_time = time.time() - t0
 
     assert total_time > 2
 
 
-def test_integration_http_status_500(cf3_temp_cache, monkeypatch):
-    monkeypatch.setattr(pycf3.CF3, "URL", "http://httpbin.org/status/500")
+def test_integration_timeout(
+    fakeclient_class, fakeclient_temp_cache, monkeypatch
+):
+    monkeypatch.setattr(
+        fakeclient_class, "URL", "http://httpbin.org/status/500"
+    )
 
-    cf3 = cf3_temp_cache
+    client = fakeclient_temp_cache
 
     with pytest.raises(requests.exceptions.RetryError):
-        with pytest.deprecated_call():
-            cf3.equatorial_search(distance=10)
+        client.calculate_velocity(ra=187.78917, dec=13.33386, distance=10)
