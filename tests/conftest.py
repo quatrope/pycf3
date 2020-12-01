@@ -67,9 +67,13 @@ def no_cache():
     return pycf3.NoCache()
 
 
-@pytest.fixture
-def cf3_no_cache(no_cache):
-    return pycf3.CF3(cache=no_cache)
+@pytest.fixture(scope="session")
+def fakeclient_class():
+    class Fake(pycf3.AbstractClient):
+        CALCULATOR = "fake"
+        URL = "nowhere://no.where"
+
+    return Fake
 
 
 @pytest.fixture
@@ -77,6 +81,21 @@ def tmp_cache(tmp_path):
     cache = dcache.Cache(directory=tmp_path)
     yield cache
     cache.clear()
+
+
+@pytest.fixture
+def fakeclient_no_cache(fakeclient_class, no_cache):
+    return fakeclient_class(cache=no_cache)
+
+
+@pytest.fixture
+def fakeclient_temp_cache(fakeclient_class, tmp_cache):
+    return fakeclient(cache=tmp_cache)
+
+
+@pytest.fixture
+def cf3_no_cache(no_cache):
+    return pycf3.CF3(cache=no_cache)
 
 
 @pytest.fixture
