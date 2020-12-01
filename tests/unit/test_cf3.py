@@ -289,10 +289,3 @@ def test_calculate_distance_velocity_gt_15000(params, cf3_no_cache):
     cf3 = cf3_no_cache
     with pytest.raises(ValueError):
         cf3.calculate_distance(velocity=15_001, **params)
-
-
-def test_calculate_distance_multiple_delta(cf3_no_cache):
-    cf3 = cf3_no_cache
-    params = {"ra": 1, "dec": 1, "glat": 1}
-    with pytest.raises(pycf3.MixedCoordinateSystemError):
-        cf3.calculate_distance(velocity=10, **params)

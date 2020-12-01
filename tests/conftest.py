@@ -97,6 +97,26 @@ def fakeclient_temp_cache(fakeclient_class, tmp_cache):
     return fakeclient_class(cache=tmp_cache)
 
 
+# =============================================================================
+# NAM
+# =============================================================================
+
+
+@pytest.fixture
+def nam_no_cache(no_cache):
+    return pycf3.NAM(cache=no_cache)
+
+
+@pytest.fixture
+def nam_temp_cache(tmp_cache):
+    return pycf3.NAM(cache=tmp_cache)
+
+
+# =============================================================================
+# CF3
+# =============================================================================
+
+
 @pytest.fixture
 def cf3_no_cache(no_cache):
     return pycf3.CF3(cache=no_cache)

@@ -307,3 +307,10 @@ def test_calculate_distance_multiple_alpha(fakeclient_no_cache):
     params = {"ra": 1, "dec": 1, "glon": 1}
     with pytest.raises(pycf3.MixedCoordinateSystemError):
         client.calculate_distance(velocity=10, **params)
+
+
+def test_calculate_distance_multiple_delta(fakeclient_no_cache):
+    client = fakeclient_no_cache
+    params = {"ra": 1, "dec": 1, "glat": 1}
+    with pytest.raises(pycf3.MixedCoordinateSystemError):
+        client.calculate_distance(velocity=10, **params)
