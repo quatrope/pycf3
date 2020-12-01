@@ -728,17 +728,17 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
 
 # =============================================================================
-# CF3 CLIENT
+# NAM CLIENT
 # =============================================================================
 
 
-class CF3(AbstractClient):
-    """Client for the *Cosmicflows-3 Distance-Velocity Calculator* [1]_.
+class NAM(AbstractClient):
+    """Client for the *NAM Distance-Velocity Calculator* [1]_.
 
-    It computes expectation distances or velocities based on smoothed
-    velocity field from the Wiener filter model of Graziani et al. 2019 [2]_.
+    Compute expectation distances or velocities based on smoothed velocity
+    field from the Numerical Action Methods model of Shaya et al. 2017. [2]_.
 
-    More information: http://edd.ifa.hawaii.edu/CF3calculator/ .
+    More information: http://edd.ifa.hawaii.edu/NAMcalculator.
 
     References
     ----------
@@ -747,7 +747,40 @@ class CF3(AbstractClient):
        Cosmicflows-3: Two Distance-Velocity Calculators.
        The Astronomical Journal, 159(2), 67.
 
-    .. [2] Graziani, R., Courtois, H. M., Lavaux, G., Hoffman, Y.,
+    .. [2] Shaya, E. J., Tully, R. B., Hoffman, Y., & Pomarède, D. (2017).
+       Action dynamics of the local supercluster.
+       The Astrophysical Journal, 850(2), 207.
+
+    """
+
+    CALCULATOR = "NAM"
+    URL = "http://edd.ifa.hawaii.edu/NAM/api.php"
+
+    MAX_DISTANCE = 38
+    MAX_VELOCITY = 2400
+
+
+# =============================================================================
+# CF3 CLIENT
+# =============================================================================
+
+
+class CF3(AbstractClient):
+    """Client for the *Cosmicflows-3 Distance-Velocity Calculator* [3]_.
+
+    It computes expectation distances or velocities based on smoothed
+    velocity field from the Wiener filter model of Graziani et al. 2019 [4]_.
+
+    More information: http://edd.ifa.hawaii.edu/CF3calculator/ .
+
+    References
+    ----------
+    .. [3] Kourkchi, E., Courtois, H. M., Graziani, R., Hoffman, Y.,
+       Pomarede, D., Shaya, E. J., & Tully, R. B. (2020).
+       Cosmicflows-3: Two Distance-Velocity Calculators.
+       The Astronomical Journal, 159(2), 67.
+
+    .. [4] Graziani, R., Courtois, H. M., Lavaux, G., Hoffman, Y.,
        Tully, R. B., Copin, Y., & Pomarède, D. (2019).
        The peculiar velocity field up to z∼ 0.05 by forward-modelling
        Cosmicflows-3 data. Monthly Notices of the Royal Astronomical Society,
