@@ -24,8 +24,6 @@ Warning this code is SLOW!
 import random
 import time
 
-import pycf3
-
 import pytest
 
 import requests
@@ -69,7 +67,7 @@ def test_integration_timeout(
     assert total_time > 2
 
 
-def test_integration_timeout(
+def test_integration_http_status_500(
     fakeclient_class, fakeclient_temp_cache, monkeypatch
 ):
     monkeypatch.setattr(

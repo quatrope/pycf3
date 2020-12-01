@@ -34,7 +34,7 @@ import requests
 # MARKERS
 # =============================================================================
 
-pytestmark = [pytest.mark.integration]
+pytestmark = [pytest.mark.integration, pytest.mark.deprecated_api]
 
 
 # =============================================================================
