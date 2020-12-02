@@ -296,6 +296,17 @@ class Result:
 
     search_at_ = attr.ib(init=False, repr=False)
 
+    def __attrs_post_init__(self):
+        dirp = "/home/juan/proyectos/cf3/src/tests/mock_data/nam"
+        system = self.coordinate.value.title().replace("galactic", "Galactic")
+        method = self.search_by.value
+        val = int(self.distance or self.velocity)
+        filename = f"tc{system}_{method}_{val}.pkl"
+        filepath = f"{dirp}/{filename}"
+        import joblib
+        joblib.dump(self.response_, filepath)
+
+
     @property
     def json_(self):
         """Proxy to ``response_.json()``."""
@@ -303,19 +314,29 @@ class Result:
 
     @observed_distance_.default
     def _observed_distance_default(self):
-        return np.array(self.json_["observed"]["distance"])
+        if "observed" in self.json_:
+            return np.array(self.json_["observed"]["distance"])
+        return np.array(self.json_["distance"])
 
     @observed_velocity_.default
     def _observed_velocity_default(self):
-        return self.json_["observed"]["velocity"]
+        if "observed" in self.json_:
+            return self.json_["observed"]["velocity"]
+        return self.json_["velocity"]
 
     @adjusted_distance_.default
     def _adjusted_distance_default(self):
-        return np.array(self.json_["adjusted"]["distance"])
+        try:
+            return np.array(self.json_["adjusted"]["distance"])
+        except KeyError:
+            return None
 
     @adjusted_velocity_.default
     def _adjusted_velocity_default(self):
-        return self.json_["adjusted"]["velocity"]
+        try:
+            return self.json_["adjusted"]["velocity"]
+        except KeyError:
+            return None
 
     @search_at_.default
     def _search_at_default(self):
@@ -516,12 +537,6 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
                     retry=True,
                 )
 
-        import ipdb; ipdb.set_trace()
-
-        # dirp = "/home/juan/proyectos/cf3/src/tests/mock_data/nam"
-        # system = self.coordinate.value
-        # method = self.search_by.value
-        # val = int(self.distance or self.velocity)
         result = Result(
             calculator=self.CALCULATOR,
             url=self.URL,
