@@ -296,17 +296,6 @@ class Result:
 
     search_at_ = attr.ib(init=False, repr=False)
 
-    def __attrs_post_init__(self):
-        dirp = "/home/juan/proyectos/cf3/src/tests/mock_data/nam"
-        system = self.coordinate.value.title().replace("galactic", "Galactic")
-        method = self.search_by.value
-        val = int(self.distance or self.velocity)
-        filename = f"tc{system}_{method}_{val}.pkl"
-        filepath = f"{dirp}/{filename}"
-        import joblib
-        joblib.dump(self.response_, filepath)
-
-
     @property
     def json_(self):
         """Proxy to ``response_.json()``."""
