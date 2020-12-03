@@ -2,6 +2,7 @@
 
 ![image](https://raw.githubusercontent.com/quatrope/pycf3/master/res/logo.png)
 
+
 [![QuatroPe](https://img.shields.io/badge/QuatroPe-Applications-1c5896)](https://quatrope.github.io/)
 [![Travis-CI](https://travis-ci.com/quatrope/pycf3.svg?branch=master)](https://travis-ci.com/quatrope/pycf3)
 [![ReadTheDocs.org](https://readthedocs.org/projects/pycf3/badge/?version=latest)](https://pycf3.readthedocs.io/en/latest/?badge=latest)
@@ -53,10 +54,12 @@ $ pip install -e .
 ```pycon
 >>> import pycf3
 >>> cf3 = pycf3.CF3()
->>> cf3.calculate_distance(sgl=102.0, sgb=-2.0, cone=10.0, distance=None velocity=None)
->>> result = cf3.supergalactic_search(distance=10)
->>> print(result.Vls_Observed_)
->>> print(result.Vls_Observed_)
+>>> cf3.calculate_distance(sgl=102.0, distance=None velocity=None)
+>>> result = cf3.calculate_distance(9000, glon=283, glat=75)
+>>> print(result.observed_velocity_)
+9000.0
+>>> result.observed_distance_
+array([136.90134347])
 ```
 
 For more information, read the [tutorial in the
