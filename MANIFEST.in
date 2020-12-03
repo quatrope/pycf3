@@ -4,6 +4,7 @@ include CODE_OF_CONDUCT.md
 
 recursive-exclude tests *
 recursive-exclude docs *
+recursive-exclude res *
 
 exclude tox.ini
 exclude pyproject.toml
