@@ -8,6 +8,7 @@ addopts = "-m 'not integration'"
 markers = [
     "ALL: All tests are marked with this marker",
     "integration: Integration tests",
+    "deprecated_api: Uses the old coordinate based Python API",
     ]
 testpaths = [
     "tests",

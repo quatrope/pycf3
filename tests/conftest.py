@@ -26,6 +26,8 @@ import diskcache as dcache
 
 import joblib
 
+import numpy as np
+
 import pycf3
 
 import pytest
@@ -67,9 +69,15 @@ def no_cache():
     return pycf3.NoCache()
 
 
-@pytest.fixture
-def cf3_no_cache(no_cache):
-    return pycf3.CF3(cache=no_cache)
+@pytest.fixture(scope="session")
+def fakeclient_class():
+    class Fake(pycf3.AbstractClient):
+        CALCULATOR = "fake"
+        URL = "nowhere://no.where"
+        MAX_DISTANCE = np.iinfo(int).max
+        MAX_VELOCITY = np.iinfo(int).max
+
+    return Fake
 
 
 @pytest.fixture
@@ -77,6 +85,41 @@ def tmp_cache(tmp_path):
     cache = dcache.Cache(directory=tmp_path)
     yield cache
     cache.clear()
+
+
+@pytest.fixture
+def fakeclient_no_cache(fakeclient_class, no_cache):
+    return fakeclient_class(cache=no_cache)
+
+
+@pytest.fixture
+def fakeclient_temp_cache(fakeclient_class, tmp_cache):
+    return fakeclient_class(cache=tmp_cache)
+
+
+# =============================================================================
+# NAM
+# =============================================================================
+
+
+@pytest.fixture
+def nam_no_cache(no_cache):
+    return pycf3.NAM(cache=no_cache)
+
+
+@pytest.fixture
+def nam_temp_cache(tmp_cache):
+    return pycf3.NAM(cache=tmp_cache)
+
+
+# =============================================================================
+# CF3
+# =============================================================================
+
+
+@pytest.fixture
+def cf3_no_cache(no_cache):
+    return pycf3.CF3(cache=no_cache)
 
 
 @pytest.fixture

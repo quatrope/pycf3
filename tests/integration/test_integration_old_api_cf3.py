@@ -10,8 +10,11 @@
 # DOCS
 # =============================================================================
 
-"""Test for Python client for Cosmicflows-3 Distance-Velocity Calculator at
-distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
+"""Integration Test for Python client for Cosmicflows-3 Distance-Velocity
+Calculator at distances less than 400 Mpc
+(http://edd.ifa.hawaii.edu/CF3calculator/)
+
+Warning this code is SLOW!
 
 """
 
@@ -19,6 +22,7 @@ distances less than 400 Mpc (http://edd.ifa.hawaii.edu/CF3calculator/)
 # =============================================================================
 # IMPORTS
 # =============================================================================
+
 import random
 import time
 
@@ -28,11 +32,12 @@ import pycf3
 
 import pytest
 
+
 # =============================================================================
 # MARKERS
 # =============================================================================
 
-pytestmark = [pytest.mark.integration]
+pytestmark = [pytest.mark.integration, pytest.mark.deprecated_api]
 
 
 # =============================================================================
@@ -50,12 +55,15 @@ def teardown_function(function):
 # =============================================================================
 
 
-def test_equatorial_calculate_velocity_dis_EQ_10(
-    cf3_temp_cache, load_mresponse
-):
+def test_integration_equatorial_search(cf3_temp_cache):
     cf3 = cf3_temp_cache
 
-    result = cf3.calculate_velocity(ra=187.78917, dec=13.33386, distance=10)
+    assert len(cf3.cache) == 0
+
+    with pytest.deprecated_call():
+        result = cf3.equatorial_search(distance=10)
+
+    assert len(cf3.cache) == 1
 
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
@@ -84,36 +92,13 @@ def test_equatorial_calculate_velocity_dis_EQ_10(
     npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
     npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
+    with pytest.deprecated_call():
+        cf3.equatorial_search(distance=10)
+    assert len(cf3.cache) == 1
 
-def test_equatorial_calculate_distance_vel_EQ_10(
-    cf3_temp_cache, load_mresponse
-):
-    cf3 = cf3_temp_cache
-
-    result = cf3.calculate_distance(ra=187.78917, dec=13.33386, velocity=10)
-
-    assert result.calculator == pycf3.CF3.CALCULATOR
-    assert result.url == pycf3.CF3.URL
-    assert result.coordinate == pycf3.CoordinateSystem.equatorial
-    assert result.search_by == pycf3.Parameter.velocity
-    assert result.distance is None
-    assert result.velocity == 10
-
-    npt.assert_array_equal(result.observed_distance_, [-1000])
-    npt.assert_almost_equal(result.observed_velocity_, 10, decimal=4)
-
-    npt.assert_array_equal(result.adjusted_distance_, [-1000])
-    npt.assert_almost_equal(result.adjusted_velocity_, 10, decimal=4)
-
-    npt.assert_almost_equal(result.alpha, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.delta, 13.33386, decimal=4)
-
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        cf3.equatorial_search(distance=11)
+    assert len(cf3.cache) == 2
 
 
 # =============================================================================
@@ -121,10 +106,15 @@ def test_equatorial_calculate_distance_vel_EQ_10(
 # =============================================================================
 
 
-def test_galactic_calculate_velocity_dis_EQ_10(cf3_temp_cache, load_mresponse):
+def test_integration_galactic_search(cf3_temp_cache):
     cf3 = cf3_temp_cache
 
-    result = cf3.calculate_velocity(glon=282.96547, glat=75.41360, distance=10)
+    assert len(cf3.cache) == 0
+
+    with pytest.deprecated_call():
+        result = cf3.galactic_search(distance=10)
+
+    assert len(cf3.cache) == 1
 
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
@@ -151,34 +141,13 @@ def test_galactic_calculate_velocity_dis_EQ_10(cf3_temp_cache, load_mresponse):
     npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
     npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
+    with pytest.deprecated_call():
+        cf3.galactic_search(distance=10)
+    assert len(cf3.cache) == 1
 
-def test_galactic_calculate_distance_vel_EQ_10(cf3_temp_cache, load_mresponse):
-    cf3 = cf3_temp_cache
-
-    result = cf3.calculate_distance(glon=282.96547, glat=75.41360, velocity=10)
-
-    assert result.calculator == pycf3.CF3.CALCULATOR
-    assert result.url == pycf3.CF3.URL
-    assert result.coordinate == pycf3.CoordinateSystem.galactic
-    assert result.search_by == pycf3.Parameter.velocity
-    assert result.distance is None
-    assert result.velocity == 10
-
-    npt.assert_array_equal(result.observed_distance_, [-1000])
-    npt.assert_almost_equal(result.observed_velocity_, 10, decimal=4)
-
-    npt.assert_array_equal(result.adjusted_distance_, [-1000])
-    npt.assert_almost_equal(result.adjusted_velocity_, 10, decimal=4)
-
-    npt.assert_almost_equal(result.alpha, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.delta, 75.41360, decimal=4)
-
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        cf3.galactic_search(distance=11)
+    assert len(cf3.cache) == 2
 
 
 # =============================================================================
@@ -186,12 +155,15 @@ def test_galactic_calculate_distance_vel_EQ_10(cf3_temp_cache, load_mresponse):
 # =============================================================================
 
 
-def test_sgalactic_calculate_velocity_dis_EQ_10(
-    cf3_temp_cache, load_mresponse
-):
+def test_integration_supergalactic_search(cf3_temp_cache):
     cf3 = cf3_temp_cache
 
-    result = cf3.calculate_velocity(sgl=102.0, sgb=-2.0, distance=10)
+    assert len(cf3.cache) == 0
+
+    with pytest.deprecated_call():
+        result = cf3.supergalactic_search(distance=10)
+
+    assert len(cf3.cache) == 1
 
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
@@ -218,33 +190,10 @@ def test_sgalactic_calculate_velocity_dis_EQ_10(
     npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
     npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
+    with pytest.deprecated_call():
+        cf3.supergalactic_search(distance=10)
+    assert len(cf3.cache) == 1
 
-def test_sgalactic_calculate_distance_vel_EQ_10(
-    cf3_temp_cache, load_mresponse
-):
-    cf3 = cf3_temp_cache
-
-    result = cf3.calculate_distance(sgl=102.0, sgb=-2.0, velocity=10)
-
-    assert result.calculator == pycf3.CF3.CALCULATOR
-    assert result.url == pycf3.CF3.URL
-    assert result.coordinate == pycf3.CoordinateSystem.supergalactic
-    assert result.search_by == pycf3.Parameter.velocity
-    assert result.distance is None
-    assert result.velocity == 10
-
-    npt.assert_array_equal(result.observed_distance_, [-1000])
-    npt.assert_almost_equal(result.observed_velocity_, 10, decimal=4)
-
-    npt.assert_array_equal(result.adjusted_distance_, [-1000])
-    npt.assert_almost_equal(result.adjusted_velocity_, 10, decimal=4)
-
-    npt.assert_almost_equal(result.alpha, 102, decimal=4)
-    npt.assert_almost_equal(result.delta, -2, decimal=4)
-
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        cf3.supergalactic_search(distance=11)
+    assert len(cf3.cache) == 2

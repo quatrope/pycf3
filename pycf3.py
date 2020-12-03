@@ -25,7 +25,15 @@ For citation check:
 """
 
 
-__all__ = ["CF3", "Result", "NoCache", "RetrySession"]
+__all__ = [
+    "CFDeprecationWarning",
+    "MixedCoordinateSystemError",
+    "NAM",
+    "CF3",
+    "Result",
+    "NoCache",
+    "RetrySession",
+]
 
 __version__ = "2020.11b"
 
@@ -34,6 +42,7 @@ __version__ = "2020.11b"
 # IMPORTS
 # =============================================================================
 
+import itertools as it
 import os
 import typing as t
 from collections import namedtuple
@@ -43,6 +52,8 @@ from enum import Enum
 import attr
 
 from custom_inherit import DocInheritMeta
+
+from deprecated import deprecated
 
 import diskcache as dcache
 
@@ -74,6 +85,7 @@ ALPHA = {
     CoordinateSystem.supergalactic: "sgl",
 }
 
+ALPHA_TO_COORDINATE = {v: k for k, v in ALPHA.items()}
 
 DELTA = {
     CoordinateSystem.equatorial: "dec",
@@ -81,11 +93,29 @@ DELTA = {
     CoordinateSystem.supergalactic: "sgb",
 }
 
+DELTA_TO_COORDINATE = {v: k for k, v in DELTA.items()}
+
+ALPHA_DELTA_TO_COORDINATE = dict(
+    it.chain(ALPHA_TO_COORDINATE.items(), DELTA_TO_COORDINATE.items())
+)
 
 PYCF3_DATA = os.path.expanduser(os.path.join("~", "pycf3_data"))
 
 
 DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
+
+# ===============================================================================
+# EXCEPTIONS
+# ===============================================================================
+
+
+class MixedCoordinateSystemError(ValueError):
+    """Raised when the parameters are 0from different coordinates systems."""
+
+
+class CFDeprecationWarning(DeprecationWarning):
+    """Custom class to inform that some funcionality is in desuse."""
+
 
 # =============================================================================
 # RETRY SESSION IMPLEMENTATION
@@ -273,19 +303,29 @@ class Result:
 
     @observed_distance_.default
     def _observed_distance_default(self):
-        return np.array(self.json_["observed"]["distance"])
+        if "observed" in self.json_:
+            return np.array(self.json_["observed"]["distance"])
+        return np.array(self.json_["distance"])
 
     @observed_velocity_.default
     def _observed_velocity_default(self):
-        return self.json_["observed"]["velocity"]
+        if "observed" in self.json_:
+            return self.json_["observed"]["velocity"]
+        return self.json_["velocity"]
 
     @adjusted_distance_.default
     def _adjusted_distance_default(self):
-        return np.array(self.json_["adjusted"]["distance"])
+        try:
+            return np.array(self.json_["adjusted"]["distance"])
+        except KeyError:
+            return None
 
     @adjusted_velocity_.default
     def _adjusted_velocity_default(self):
-        return self.json_["adjusted"]["velocity"]
+        try:
+            return self.json_["adjusted"]["velocity"]
+        except KeyError:
+            return None
 
     @search_at_.default
     def _search_at_default(self):
@@ -336,13 +376,73 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
     def _cache_default(self):
         return dcache.Cache(directory=DEFAULT_CACHE_DIR)
 
+    def _determine_coordinate_system(self, ra, dec, glon, glat, sgl, sgb):
+
+        # first we put all the parameters ina single
+        # dictionaty
+        params = {
+            "ra": ra,
+            "dec": dec,
+            "glon": glon,
+            "glat": glat,
+            "sgl": sgl,
+            "sgb": sgb,
+        }
+
+        # next we remove all with the default None value
+        params = {k: v for k, v in params.items() if v is not None}
+
+        # if we have 0 values no coordinate was given
+        if len(params) == 0:
+            raise ValueError(
+                "No coordinate was provided. "
+                "Please provide (ra, dec)', '(glon, glat)' or '(sgl, sgb)'."
+            )
+
+        # if we only have one we need to check wich one and inform about
+        # the mising companinon
+        if len(params) == 1:
+            pname = params.keys()[0]
+            coordinate_system, companion_dict = (
+                (ALPHA_TO_COORDINATE[pname], DELTA)
+                if pname in ALPHA_TO_COORDINATE
+                else (DELTA_TO_COORDINATE[pname], ALPHA)
+            )
+            companion = companion_dict[coordinate_system]
+            raise ValueError(f"No {companion} provided")
+
+        # if we have more than two parameter we have mixed coordinate sistem
+        if len(params) > 2:
+            # first we split the parameters by coordinate_system
+            raise MixedCoordinateSystemError(", ".join(params))
+
+        # now we need to detemine the coordinate system
+        coordinate_system_candidates = {
+            ALPHA_DELTA_TO_COORDINATE[p] for p in params.keys()
+        }
+
+        # is we have more than 1 candidate we mix coordinates again
+        if len(coordinate_system_candidates) > 1:
+            raise MixedCoordinateSystemError(", ".join(params))
+
+        # we have one coordinate system and we need to dermermine which
+        # is alpha and wich is delta
+        coordinate_system = coordinate_system_candidates.pop()
+        alpha_coordinate_name = ALPHA[coordinate_system]
+        delta_coordinate_name = DELTA[coordinate_system]
+
+        alpha = params[alpha_coordinate_name]
+        delta = params[delta_coordinate_name]
+
+        return coordinate_system, alpha, delta
+
     def _search(
         self,
         coordinate_system,
         alpha,
         delta,
-        distance=None,
-        velocity=None,
+        distance,
+        velocity,
         **get_kwargs,
     ):
 
@@ -363,6 +463,8 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
                 f"{DELTA[coordinate_system]} must be >= -90 and <= 90"
             )
 
+        # ESTE FRAGMENTO DE CODIGO PUEDE SER ELIMINADO AL DEPRECAR EL API
+        # DESDE ===============================================================
         if (distance, velocity) == (None, None):
             raise ValueError(
                 "You must provide the distance or the velocity value"
@@ -371,13 +473,25 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
             raise ValueError(
                 "You cant provide velocity and distance at the same time"
             )
-        elif distance is not None:
+        # HASTA ===============================================================
+
+        if distance is not None:
             if not isinstance(distance, (int, float)):
-                raise TypeError("distance must be int, float or None")
+                raise TypeError("'distance' must be int or float")
+            elif not (0 < distance <= self.MAX_DISTANCE):
+                raise ValueError(
+                    f"'distance' must be > 0 and <= {self.MAX_DISTANCE}"
+                )
             parameter, value = Parameter.distance, distance
+
         elif velocity is not None:
             if not isinstance(velocity, (int, float)):
-                raise TypeError("distance must be int, float or None")
+                raise TypeError("'velocity' must be int or float")
+            elif not (0 < velocity <= self.MAX_VELOCITY):
+                raise ValueError(
+                    f"'velocity' must be > 0 and <= {self.MAX_VELOCITY}"
+                )
+
             parameter, value = Parameter.velocity, velocity
 
         payload = {
@@ -426,6 +540,67 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
         return result
 
+    # =========================================================================
+    # API
+    # =========================================================================
+
+    def calculate_distance(
+        self,
+        velocity,
+        ra=None,
+        dec=None,
+        glon=None,
+        glat=None,
+        sgl=None,
+        sgb=None,
+        **get_kwargs,
+    ):
+        coordinate_system, alpha, delta = self._determine_coordinate_system(
+            ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb
+        )
+        response = self._search(
+            coordinate_system=coordinate_system,
+            alpha=alpha,
+            delta=delta,
+            distance=None,
+            velocity=velocity,
+            **get_kwargs,
+        )
+        return response
+
+    def calculate_velocity(
+        self,
+        distance,
+        ra=None,
+        dec=None,
+        glon=None,
+        glat=None,
+        sgl=None,
+        sgb=None,
+        **get_kwargs,
+    ):
+        coordinate_system, alpha, delta = self._determine_coordinate_system(
+            ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb
+        )
+        response = self._search(
+            coordinate_system=coordinate_system,
+            alpha=alpha,
+            delta=delta,
+            distance=distance,
+            velocity=None,
+            **get_kwargs,
+        )
+        return response
+
+    # =========================================================================
+    # OLD API
+    # =========================================================================
+
+    @deprecated(
+        category=CFDeprecationWarning,
+        action="default",
+        reason="Use `calulate_velocity` or `calculate_distance` instead",
+    )
     def equatorial_search(
         self,
         ra=187.78917,
@@ -468,6 +643,11 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         )
         return response
 
+    @deprecated(
+        category=CFDeprecationWarning,
+        action="default",
+        reason="Use `calulate_velocity` or `calculate_distance` instead",
+    )
     def galactic_search(
         self,
         glon=282.96547,
@@ -510,6 +690,11 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         )
         return response
 
+    @deprecated(
+        category=CFDeprecationWarning,
+        action="default",
+        reason="Use `calulate_velocity` or `calculate_distance` instead",
+    )
     def supergalactic_search(
         self,
         sgl=102.0,
@@ -554,17 +739,17 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
 
 # =============================================================================
-# CF3 CLIENT
+# NAM CLIENT
 # =============================================================================
 
 
-class CF3(AbstractClient):
-    """Client for the *Cosmicflows-3 Distance-Velocity Calculator* [1]_.
+class NAM(AbstractClient):
+    """Client for the *NAM Distance-Velocity Calculator* [1]_.
 
-    It computes expectation distances or velocities based on smoothed
-    velocity field from the Wiener filter model of Graziani et al. 2019 [2]_.
+    Compute expectation distances or velocities based on smoothed velocity
+    field from the Numerical Action Methods model of Shaya et al. 2017. [2]_.
 
-    More information: http://edd.ifa.hawaii.edu/CF3calculator/ .
+    More information: http://edd.ifa.hawaii.edu/NAMcalculator.
 
     References
     ----------
@@ -573,7 +758,40 @@ class CF3(AbstractClient):
        Cosmicflows-3: Two Distance-Velocity Calculators.
        The Astronomical Journal, 159(2), 67.
 
-    .. [2] Graziani, R., Courtois, H. M., Lavaux, G., Hoffman, Y.,
+    .. [2] Shaya, E. J., Tully, R. B., Hoffman, Y., & Pomarède, D. (2017).
+       Action dynamics of the local supercluster.
+       The Astrophysical Journal, 850(2), 207.
+
+    """
+
+    CALCULATOR = "NAM"
+    URL = "http://edd.ifa.hawaii.edu/NAMcalculator/api.php"
+
+    MAX_DISTANCE = 38
+    MAX_VELOCITY = 2400
+
+
+# =============================================================================
+# CF3 CLIENT
+# =============================================================================
+
+
+class CF3(AbstractClient):
+    """Client for the *Cosmicflows-3 Distance-Velocity Calculator* [3]_.
+
+    It computes expectation distances or velocities based on smoothed
+    velocity field from the Wiener filter model of Graziani et al. 2019 [4]_.
+
+    More information: http://edd.ifa.hawaii.edu/CF3calculator/ .
+
+    References
+    ----------
+    .. [3] Kourkchi, E., Courtois, H. M., Graziani, R., Hoffman, Y.,
+       Pomarede, D., Shaya, E. J., & Tully, R. B. (2020).
+       Cosmicflows-3: Two Distance-Velocity Calculators.
+       The Astronomical Journal, 159(2), 67.
+
+    .. [4] Graziani, R., Courtois, H. M., Lavaux, G., Hoffman, Y.,
        Tully, R. B., Copin, Y., & Pomarède, D. (2019).
        The peculiar velocity field up to z∼ 0.05 by forward-modelling
        Cosmicflows-3 data. Monthly Notices of the Royal Astronomical Society,
@@ -583,3 +801,6 @@ class CF3(AbstractClient):
 
     CALCULATOR = "CF3"
     URL = "http://edd.ifa.hawaii.edu/CF3calculator/api.php"
+
+    MAX_DISTANCE = 200
+    MAX_VELOCITY = 15_000

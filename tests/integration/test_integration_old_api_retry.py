@@ -28,11 +28,13 @@ import pycf3
 
 import pytest
 
+import requests
+
 # =============================================================================
 # MARKERS
 # =============================================================================
 
-pytestmark = pytest.mark.integration
+pytestmark = [pytest.mark.integration, pytest.mark.deprecated_api]
 
 
 # =============================================================================
@@ -46,48 +48,28 @@ def teardown_function(function):
 
 
 # =============================================================================
-# CACHE TEST
+# RETRY
 # =============================================================================
 
 
-def test_integration_cache(tmp_cache):
-    cache = tmp_cache
-    cf3 = pycf3.CF3(cache=cache)
+def test_integration_timeout(cf3_temp_cache, monkeypatch):
+    monkeypatch.setattr(pycf3.CF3, "URL", "http://httpbin.org/delay/10")
 
-    assert len(cache) == 0
+    cf3 = cf3_temp_cache
 
-    cf3.equatorial_search(velocity=10)
-    cf3.equatorial_search(velocity=10)
+    t0 = time.time()
+    with pytest.raises(requests.ConnectionError), pytest.deprecated_call():
+        cf3.equatorial_search(distance=10, timeout=2)
+    total_time = time.time() - t0
 
-    assert len(cache) == 1
-
-
-def test_integration_no_cache(no_cache):
-    cache = no_cache
-
-    cf3 = pycf3.CF3(cache=cache)
-
-    assert len(cache) == 0
-
-    cf3.equatorial_search(velocity=10)
-    cf3.equatorial_search(velocity=10)
-
-    assert len(cache) == 0
+    assert total_time > 2
 
 
-def test_integration_cache_expire(tmp_cache):
-    cache = tmp_cache
+def test_integration_http_status_500(cf3_temp_cache, monkeypatch):
+    monkeypatch.setattr(pycf3.CF3, "URL", "http://httpbin.org/status/500")
 
-    cf3 = pycf3.CF3(cache=cache, cache_expire=2)
+    cf3 = cf3_temp_cache
 
-    assert len(cache) == 0
-
-    cf3.equatorial_search(distance=10)
-
-    assert len(cache) == 1
-
-    time.sleep(3)
-
-    cf3.equatorial_search(distance=10)
-
-    assert len(cache) == 1
+    with pytest.raises(requests.exceptions.RetryError):
+        with pytest.deprecated_call():
+            cf3.equatorial_search(distance=10)
