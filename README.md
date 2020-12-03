@@ -2,6 +2,7 @@
 
 ![image](https://raw.githubusercontent.com/quatrope/pycf3/master/res/logo.png)
 
+----
 
 [![QuatroPe](https://img.shields.io/badge/QuatroPe-Applications-1c5896)](https://quatrope.github.io/)
 [![Travis-CI](https://travis-ci.com/quatrope/pycf3.svg?branch=master)](https://travis-ci.com/quatrope/pycf3)
