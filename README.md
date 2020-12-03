@@ -54,7 +54,7 @@ $ pip install -e .
 
 ```pycon
 >>> import pycf3
->>> result = cf3.calculate_distance(9000, glon=283, glat=75)
+>>> result = cf3.calculate_distance(velocity=9000, glon=283, glat=75)
 >>> print(result.observed_velocity_)
 9000.0
 >>> result.observed_distance_
