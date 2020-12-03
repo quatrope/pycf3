@@ -12,8 +12,15 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
+import pathlib
+
+
+# this path is pointing to project/docs/source
+CURRENT_PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
+PROJECT_PATH = CURRENT_PATH.parent.parent
+
+sys.path.insert(0, str(PROJECT_PATH))
+
 
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -42,15 +49,14 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-    'nbsphinx']
+    'nbsphinx',
+    'IPython.sphinxext.ipython_console_highlighting']
 
 exclude_patterns = ['_build', 'source/.ipynb_checkpoints/*']
 
 numpydoc_class_members_toctree = False
 
 nbsphinx_execute = 'never'  # access the server is slow
-
-
 
 
 # Add any paths that contain templates here, relative to this directory.
@@ -76,3 +82,39 @@ html_static_path = ['_static']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
+# =============================================================================
+# PREPROCESS RST
+# =============================================================================
+
+import m2r
+
+with open(PROJECT_PATH / "README.md") as fp:
+    md = fp.read()
+
+
+index = f"""
+
+{m2r.convert(md)}
+
+Contents:
+---------
+
+.. toctree::
+    :maxdepth: 3
+
+    tutorial.ipynb
+    api
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+"""
+
+with open(CURRENT_PATH / "index.rst", "w") as fp:
+    fp.write(index)

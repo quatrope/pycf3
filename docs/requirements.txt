@@ -1,5 +1,6 @@
 Sphinx<3.0
 sphinxcontrib-napoleon==0.7
-sphinx_rtd_theme==0.4.3
+sphinx_rtd_theme
 ipykernel
 nbsphinx
+m2r

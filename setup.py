@@ -44,16 +44,12 @@ REQUIREMENTS = [
     "Deprecated",
 ]
 
-with open(PATH / "README.rst") as fp:
+with open(PATH / "README.md") as fp:
     LONG_DESCRIPTION = fp.read()
 
-DESCRIPTION = [
-    line
-    for line in LONG_DESCRIPTION.split("Description\n-----------", 1)[
-        -1
-    ].splitlines()
-    if line.strip()
-][0]
+DESCRIPTION = (
+    "Cosmicflows Galaxy Distance-Velocity Calculator client for Python"
+)
 
 with open(PATH / "pycf3.py") as fp:
     VERSION = (
@@ -75,6 +71,7 @@ def do_setup():
         version=VERSION,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
+        long_description_content_type="text/markdown",
         author="QuatroPe",
         author_email="jbc.develop@gmail.com",
         url="https://github.com/quatrope/pycf3",
