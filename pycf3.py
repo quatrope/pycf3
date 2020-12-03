@@ -272,8 +272,6 @@ class Result:
     response_ : ``requests.Response``
         Original response object create by the *requests* library.
         More information: https://2.python-requests.org
-    json_: ``dict``
-        The parsed data inside the response.
 
     """
 
