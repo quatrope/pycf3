@@ -15,7 +15,8 @@
 ## Description
 
 pycf3 is a Python client for the
-[Cosmicflows-3 Distance-Velocity Calculator](http://edd.ifa.hawaii.edu/CF3calculator/), and [NAM Distance-Velocity Calculator](http://edd.ifa.hawaii.edu/NAMcalculator/)
+[Cosmicflows-3 Distance-Velocity Calculator](http://edd.ifa.hawaii.edu/CF3calculator/),
+and [NAM Distance-Velocity Calculator](http://edd.ifa.hawaii.edu/NAMcalculator/)
 
 
 ## Code Repository & Issues
@@ -27,7 +28,9 @@ https://github.com/quatrope/pycf3
 
 pycf3 is under [The BSD 3 License](https://www.tldrlegal.com/l/bsd3)
 
-The BSD 3-clause license allows you almost unlimited freedom with the software so long as you include the BSD copyright and license notice in it (found in [Fulltext](https://raw.githubusercontent.com/quatrope/pycf3/master/LICENSE)).
+The BSD 3-clause license allows you almost unlimited freedom with the software
+so long as you include the BSD copyright and license notice in it
+(found in [Fulltext](https://raw.githubusercontent.com/quatrope/pycf3/master/LICENSE)).
 
 
 ## Basic Install
