@@ -86,10 +86,12 @@ Quick Usage
 
    >>> import pycf3
    >>> cf3 = pycf3.CF3()
-   >>> cf3.calculate_distance(sgl=102.0, sgb=-2.0, cone=10.0, distance=None velocity=None)
-   >>> result = cf3.supergalactic_search(distance=10)
-   >>> print(result.Vls_Observed_)
-   >>> print(result.Vls_Observed_)
+   >>> cf3.calculate_distance(sgl=102.0, distance=None velocity=None)
+   >>> result = cf3.calculate_distance(9000, glon=283, glat=75)
+   >>> print(result.observed_velocity_)
+   9000.0
+   >>> result.observed_distance_
+   array([136.90134347])
 
 For more information, read the `tutorial in the
 documentation <https://pycf3.readthedocs.io>`_.

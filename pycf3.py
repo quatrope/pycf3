@@ -343,7 +343,7 @@ class Result:
 # =============================================================================
 
 
-@attr.s(eq=False, order=False, frozen=True)
+@attr.s(eq=False, order=False, frozen=True, repr=False)
 class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
     """Abstract base class for all clients.
 
@@ -376,8 +376,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
     def _determine_coordinate_system(self, ra, dec, glon, glat, sgl, sgb):
 
-        # first we put all the parameters ina single
-        # dictionaty
+        # first we put all the parameters in a single dictionary
         params = {
             "ra": ra,
             "dec": dec,
@@ -387,7 +386,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
             "sgb": sgb,
         }
 
-        # next we remove all with the default None value
+        # next we remove all keys with the default value `None`
         params = {k: v for k, v in params.items() if v is not None}
 
         # if we have 0 values no coordinate was given
@@ -409,9 +408,8 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
             companion = companion_dict[coordinate_system]
             raise ValueError(f"No {companion} provided")
 
-        # if we have more than two parameter we have mixed coordinate sistem
+        # if we have more than two parameter we have mixed coordinate system
         if len(params) > 2:
-            # first we split the parameters by coordinate_system
             raise MixedCoordinateSystemError(", ".join(params))
 
         # now we need to detemine the coordinate system
@@ -419,7 +417,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
             ALPHA_DELTA_TO_COORDINATE[p] for p in params.keys()
         }
 
-        # is we have more than 1 candidate we mix coordinates again
+        # if we have more than 1 candidate we mix coordinates again
         if len(coordinate_system_candidates) > 1:
             raise MixedCoordinateSystemError(", ".join(params))
 
@@ -539,6 +537,18 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         return result
 
     # =========================================================================
+    # INTERNALS
+    # =========================================================================
+
+    def __repr__(self):
+        """x.__repr__() <==> repr(x)."""
+        cls = type(self).__name__
+        calculator = f"calculator='{self.CALCULATOR}'"
+        cachedir = f"cache_dir='{getattr(self.cache, 'directory', '')}'"
+        expire = f"cache_expire={self.cache_expire}"
+        return f"{cls}({calculator}, {cachedir}, {expire})"
+
+    # =========================================================================
     # API
     # =========================================================================
 
@@ -553,6 +563,53 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         sgb=None,
         **get_kwargs,
     ):
+        """Calculate a distance based on the given velocity and location.
+
+        The mandatory parameters are ``velocity ' and a position
+        expressed in two components depending on the chosen coordinate system:
+
+         - ``ra'' and ``dec'' for an equatorial system.
+         - ``glon'' and ``glat'' for a galactic system.
+         - ``sgl'' and ``sgb'' for a supergalactic system.
+
+        Coordinates cannot be mixed between systems, and must be expressed in
+        J2000 as 360° decimal.
+
+        The returned distance(s) are expressed in Mpc, and potentially can
+        be more than one value.
+
+        Parameters
+        ----------
+        velocity : ``int`` or ``float``
+            Model velocity in km/s.
+        ra : ``int`` or ``float`` (optional)
+            Right ascension. If you provide ``ra`` you need to provide also
+            ``dec``.
+        dec : ``int`` or ``float`` (optional)
+            Declination. ``dec`` must be >= -90 and <= 90. If you provide
+            ``dec`` you need to provide also ``ra``.
+        glon : ``int`` or ``float`` (optional)
+            Galactic longitude. If you provide ``glon`` you need to provide
+            also ``glat``.
+        glat: ``int`` or ``float`` (optional)
+            Galactic latitude. ``glat`` must be >= -90 and <= 90. If you
+            provide ``glat`` you need to provide also ``glon``.
+        sgl : ``int`` or ``float`` (optional)
+            Super-galactic longitude. If you provide ``sgl`` you need to
+            provide also ``sgb``.
+        sgb: ``int`` or ``float`` (optional)
+            Super-galactic latitude. ``sgb`` must be >= -90 and <= 90.
+            If you  provide ``sgb`` you need to provide also ``sgl``.
+        get_kwargs:
+            Optional arguments that ``request.get`` takes.
+
+        Returns
+        -------
+        pycf3.Result :
+            Result object that automatically parses the entire model
+            returned by the remote calculator.
+
+        """
         coordinate_system, alpha, delta = self._determine_coordinate_system(
             ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb
         )
@@ -577,6 +634,52 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         sgb=None,
         **get_kwargs,
     ):
+        """Calculate a velocity based on the given distance and location.
+
+        The mandatory parameters are ``distance ' and a position
+        expressed in two components depending on the chosen coordinate system:
+
+         - ``ra'' and ``dec'' for an equatorial system.
+         - ``glon'' and ``glat'' for a galactic system.
+         - ``sgl'' and ``sgb'' for a supergalactic system.
+
+        Coordinates cannot be mixed between systems, and must be expressed in
+        J2000 as 360° decimal.
+
+        The returned velocity are expressed in Km/s.
+
+        Parameters
+        ----------
+        distance : ``int`` or ``float``
+            Distance(s) in Mpc.
+        ra : ``int`` or ``float`` (optional)
+            Right ascension. If you provide ``ra`` you need to provide also
+            ``dec``.
+        dec : ``int`` or ``float`` (optional)
+            Declination. ``dec`` must be >= -90 and <= 90. If you provide
+            ``dec`` you need to provide also ``ra``.
+        glon : ``int`` or ``float`` (optional)
+            Galactic longitude. If you provide ``glon`` you need to provide
+            also ``glat``.
+        glat: ``int`` or ``float`` (optional)
+            Galactic latitude. ``glat`` must be >= -90 and <= 90. If you
+            provide ``glat`` you need to provide also ``glon``.
+        sgl : ``int`` or ``float`` (optional)
+            Super-galactic longitude. If you provide ``sgl`` you need to
+            provide also ``sgb``.
+        sgb: ``int`` or ``float`` (optional)
+            Super-galactic latitude. ``sgb`` must be >= -90 and <= 90.
+            If you  provide ``sgb`` you need to provide also ``sgl``.
+        get_kwargs:
+            Optional arguments that ``request.get`` takes.
+
+        Returns
+        -------
+        pycf3.Result :
+            Result object that automatically parses the entire model
+            returned by the remote calculator.
+
+        """
         coordinate_system, alpha, delta = self._determine_coordinate_system(
             ra=ra, dec=dec, glon=glon, glat=glat, sgl=sgl, sgb=sgb
         )
@@ -618,9 +721,10 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         dec : ``int`` or ``float`` (default: ``13.33386``)
             Declination. dec must be >= -90 and <= 90
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
-            Returns model velocity in km/s.
+            Distance(s) in Mpc.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
-            Returns model distance(s) in Mpc - potentially more than one value.
+            Velocity in km/s. The returned distance potentially can be more
+            than ine value.
         get_kwargs:
             Optional arguments that ``request.get`` takes.
 
@@ -665,9 +769,10 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         glat: ``int`` or ``float`` (default: ``75.41360``)
             Galactic latitude. dec must be >= -90 and <= 90
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
-            Returns model velocity in km/s.
+            Distance(s) in Mpc.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
-            Returns model distance(s) in Mpc - potentially more than one value.
+            Velocity in km/s. The returned distance potentially can be more
+            than ine value.
         get_kwargs:
             Optional arguments that ``request.get`` takes.
 
@@ -712,9 +817,10 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         sgb: ``int`` or ``float`` (default: ``-2``)
             Super-galactic latitude. dec must be >= -90 and <= 90
         distance : ``int``, ``float`` or ``None`` (default: ``None``)
-            Returns model velocity in km/s.
+            Distance(s) in Mpc.
         velocity : ``int``, ``float`` or ``None`` (default: ``None``)
-            Returns model distance(s) in Mpc - potentially more than one value.
+            Velocity in km/s. The returned distance potentially can be more
+            than ine value.
         get_kwargs:
             Optional arguments that ``request.get`` takes.
 

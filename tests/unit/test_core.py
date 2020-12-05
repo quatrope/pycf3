@@ -28,6 +28,17 @@ import pytest
 
 
 # =============================================================================
+# INTERNAL TESTS
+# =============================================================================
+
+
+def test_client_repr(fakeclient_no_cache):
+    result = repr(fakeclient_no_cache)
+    expected = "Fake(calculator='fake', cache_dir='', cache_expire=None)"
+    assert result == expected
+
+
+# =============================================================================
 # calculate_distance with NAN 0 or -
 # =============================================================================
 

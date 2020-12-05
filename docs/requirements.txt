@@ -4,3 +4,4 @@ Sphinx
 sphinx-rtd-theme
 nbsphinx
 m2r
+expectexception
