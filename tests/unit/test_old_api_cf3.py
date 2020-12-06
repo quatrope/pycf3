@@ -52,7 +52,10 @@ def test_equatorial_search_distance_10(cf3_no_cache, load_mresponse):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.equatorial
-    assert result.search_by == pycf3.Parameter.distance
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.distance
+
     assert result.distance == 10
     assert result.velocity is None
 
@@ -90,7 +93,10 @@ def test_equatorial_search_velocity_10(cf3_no_cache, load_mresponse):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.equatorial
-    assert result.search_by == pycf3.Parameter.velocity
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.velocity
+
     assert result.distance is None
     assert result.velocity == 10
 
@@ -171,7 +177,10 @@ def test_galactic_search_distance_10(cf3_no_cache, load_mresponse):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.galactic
-    assert result.search_by == pycf3.Parameter.distance
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.distance
+
     assert result.distance == 10
     assert result.velocity is None
 
@@ -207,7 +216,10 @@ def test_galactic_search_velocity_10(cf3_no_cache, load_mresponse):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.galactic
-    assert result.search_by == pycf3.Parameter.velocity
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.velocity
+
     assert result.distance is None
     assert result.velocity == 10
 
@@ -288,7 +300,10 @@ def test_supergalactic_search_distance_10(cf3_no_cache, load_mresponse):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.supergalactic
-    assert result.search_by == pycf3.Parameter.distance
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.distance
+
     assert result.distance == 10
     assert result.velocity is None
 
@@ -324,7 +339,10 @@ def test_supergalactic_search_velocity_10(cf3_no_cache, load_mresponse):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.supergalactic
-    assert result.search_by == pycf3.Parameter.velocity
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.velocity
+
     assert result.distance is None
     assert result.velocity == 10
 

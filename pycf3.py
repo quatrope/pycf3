@@ -43,6 +43,7 @@ __version__ = "2020.11b"
 # =============================================================================
 
 import itertools as it
+import json
 import os
 import typing as t
 from collections import namedtuple
@@ -61,6 +62,8 @@ import numpy as np
 
 import requests
 from requests.packages.urllib3.util.retry import Retry
+
+import tabulate
 
 
 # =============================================================================
@@ -103,6 +106,102 @@ PYCF3_DATA = os.path.expanduser(os.path.join("~", "pycf3_data"))
 
 
 DEFAULT_CACHE_DIR = os.path.join(PYCF3_DATA, "_cache_")
+
+RESULT_HTML_TEMPLATE = """
+<div class="result-container" id="result-{{ id_result }}">
+    <div class="result-css">
+        <style>
+            .observed {
+                color: #dc3545! important;
+            }
+
+            .adjusted {
+                color: #28a745!important;
+            }
+
+
+            tablr.result-table, div.result-raw {
+                width: 100%;
+            }
+
+            table.result-table tr{
+                 pointer-events: none;
+                 background-color: inherit !important;
+            }
+
+            .result-container code{
+                color: #e83e8c;
+                background-color: inherit !important;
+            }
+
+            .result-container .hidden {
+                display: none;
+            }
+
+            div.result-raw {
+                background-color: #333 !important;
+            }
+        </style>
+    </div>
+    <div class="result-container container-fluid">
+        <table class="result-table">
+            <thead>
+                <th colspan=3>
+                    Result - <small><code>{{ call_result }}</code></small>
+                </th>
+            </thead>
+            <tbody>
+                <tr>
+                    <th rowspan=2 class="observed">Observed</th>
+                    <td>Distance (Mpc)</td>
+                    <td>
+                        {{ result.observed_distance_ }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Velocity (Km/s)</td>
+                    <td>
+                        {{ result.observed_velocity_ }}
+                    </td>
+                </tr>
+                {% if result.adjusted_distance_ or result.adjusted_velocity_ %}
+                <tr>
+                    <th rowspan=2 class="adjusted">Adjusted</th>
+                    <td>Distance (Mpc)</td>
+                    <td>
+                        {{ result.adjusted_distance_ }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Velocity (Km/s)</td>
+                    <td>
+                        {{ result.adjusted_velocity_ }}
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        <div class="">
+            <a onclick="showRaw{{ id_result }}()" href="#">Show/Hide Raw</a>
+            <div class="result-raw">
+                <code id="result-code-{{ id_result }}" class="hidden">
+{{ json_result }}
+                </code>
+            </div>
+        </div>
+    </div>
+    <div class="result-js">
+        <script>
+            function showRaw{{ id_result }}(){
+                var showed = document.getElementById(
+                    "result-code-{{ id_result }}"
+                ).classList.toggle("hidden");
+            }
+        </script>
+    </div>
+</div>
+"""
+
 
 # ===============================================================================
 # EXCEPTIONS
@@ -246,7 +345,7 @@ class NoCache(MutableMapping):
 SearchAt = namedtuple("SearchAt", ["ra", "dec", "glon", "glat", "sgl", "sgb"])
 
 
-@attr.s(eq=False, order=False, frozen=True)
+@attr.s(eq=False, order=False, frozen=True, repr=False)
 class Result:
     r"""Parsed result.
 
@@ -263,9 +362,9 @@ class Result:
     delta : ``int`` or ``float``
         :math:`\delta` value for the coordinate system.
     distance : ``int``, ``float`` or ``None``
-        Returns model velocity in km/s.
+        Distance used to calculate the velocity in Mpc.
     velocity : ``int``, ``float`` or ``None``
-        Returns model distance(s) in Mpc - potentially more than one value.
+        Velocity used to calculate the distance in Km/s.
 
     Attributes
     ----------
@@ -279,7 +378,7 @@ class Result:
     url = attr.ib(repr=False)
 
     coordinate = attr.ib()
-    search_by = attr.ib()
+    calculated_by = attr.ib()
     alpha = attr.ib()
     delta = attr.ib()
     distance = attr.ib()
@@ -293,6 +392,86 @@ class Result:
     adjusted_velocity_ = attr.ib(init=False, repr=False)
 
     search_at_ = attr.ib(init=False, repr=False)
+
+    # =========================================================================
+    # INTERNAL
+    # =========================================================================
+
+    def _get_call_result(self):
+        alpha_name, delta_name = ALPHA[self.coordinate], DELTA[self.coordinate]
+
+        value = (
+            self.distance
+            if self.calculated_by == Parameter.distance
+            else self.velocity
+        )
+
+        call_result = (
+            f"{self.calculator}("
+            f"{self.calculated_by.value}={value}, "
+            f"{alpha_name}={self.alpha}, "
+            f"{delta_name}={self.delta})"
+        )
+
+        return call_result
+
+    def __repr__(self):
+        """x.__repr__() <==> repr(x)."""
+        # header
+        call_result = self._get_call_result()
+        header = f"Result - {call_result}"
+
+        # body
+        table = []
+        table.append(
+            [
+                "Observed\n\n",
+                "Distance (Mpc)\nVelocity (Km/s)",
+                f"{self.observed_distance_}\n{self.observed_velocity_}",
+            ]
+        )
+        if self.adjusted_distance_ or self.adjusted_velocity_:
+            table.append(
+                [
+                    "Adjusted\n\n",
+                    "Distance (Mpc)\nVelocity (Km/s)",
+                    f"{self.adjusted_distance_}\n{self.adjusted_velocity_}",
+                ]
+            )
+        body = tabulate.tabulate(table, headers="", tablefmt="grid")
+
+        # merge and return
+        return f"{header}\n{body}"
+
+    def _repr_html_(self):
+        """Create an HTML representation of the result.
+
+        Mostly used inside jupyter environment.
+
+        """
+        import jinja2  # noqa
+
+        call_result = self._get_call_result()
+
+        id_result = str(id(self) + np.random.random()).replace(".", "rr")
+
+        params = {
+            "result": self,
+            "id_result": id_result,
+            "call_result": call_result,
+            "json_result": json.dumps(self.json_, indent=2),
+        }
+        return jinja2.Template(RESULT_HTML_TEMPLATE).render(**params)
+
+    @property
+    @deprecated(
+        category=CFDeprecationWarning,
+        action="default",
+        reason="Use `calculated_by` instead",
+    )
+    def search_by(self):
+        """Proxy to ``response.calculated_by``."""
+        return self.calculated_by
 
     @property
     def json_(self):
@@ -526,7 +705,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
             calculator=self.CALCULATOR,
             url=self.URL,
             coordinate=coordinate_system,
-            search_by=parameter,
+            calculated_by=parameter,
             alpha=alpha,
             delta=delta,
             distance=distance,

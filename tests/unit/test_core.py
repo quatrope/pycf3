@@ -38,6 +38,87 @@ def test_client_repr(fakeclient_no_cache):
     assert result == expected
 
 
+@pytest.mark.parametrize(
+    "coordinate_system", pycf3.CoordinateSystem.__members__.values()
+)
+@pytest.mark.parametrize("calculated_by", pycf3.Parameter.__members__.values())
+@pytest.mark.parametrize("client_name", ["nam", "cf3"])
+def test_result_repr(
+    coordinate_system, calculated_by, client_name, load_mresponse
+):
+    fname = (
+        f"tc{coordinate_system.value.title()}_{calculated_by.value}_10.pkl"
+    ).replace("galactic", "Galactic")
+
+    response = response = load_mresponse(client_name, fname)
+
+    rdata = {k.lower(): v for k, v in response.json().items()}
+
+    distance = 10 if calculated_by == pycf3.Parameter.distance else None
+    velocity = 10 if calculated_by == pycf3.Parameter.velocity else None
+
+    calculator = "foo"
+    url = "foo://foo"
+
+    alpha_name = pycf3.ALPHA[coordinate_system].lower()
+    delta_name = pycf3.DELTA[coordinate_system].lower()
+    alpha, delta = rdata[alpha_name], rdata[delta_name]
+
+    result = pycf3.Result(
+        calculator=calculator,
+        url=url,
+        coordinate=coordinate_system,
+        calculated_by=calculated_by,
+        alpha=alpha,
+        delta=delta,
+        distance=distance,
+        velocity=velocity,
+        response_=response,
+    )
+
+    assert repr(result)  # this only run the code to check bugs
+
+
+@pytest.mark.parametrize(
+    "coordinate_system", pycf3.CoordinateSystem.__members__.values()
+)
+@pytest.mark.parametrize("calculated_by", pycf3.Parameter.__members__.values())
+@pytest.mark.parametrize("client_name", ["nam", "cf3"])
+def test_result_html_repr(
+    coordinate_system, calculated_by, client_name, load_mresponse
+):
+    fname = (
+        f"tc{coordinate_system.value.title()}_{calculated_by.value}_10.pkl"
+    ).replace("galactic", "Galactic")
+
+    response = response = load_mresponse(client_name, fname)
+
+    rdata = {k.lower(): v for k, v in response.json().items()}
+
+    distance = 10 if calculated_by == pycf3.Parameter.distance else None
+    velocity = 10 if calculated_by == pycf3.Parameter.velocity else None
+
+    calculator = "foo"
+    url = "foo://foo"
+
+    alpha_name = pycf3.ALPHA[coordinate_system].lower()
+    delta_name = pycf3.DELTA[coordinate_system].lower()
+    alpha, delta = rdata[alpha_name], rdata[delta_name]
+
+    result = pycf3.Result(
+        calculator=calculator,
+        url=url,
+        coordinate=coordinate_system,
+        calculated_by=calculated_by,
+        alpha=alpha,
+        delta=delta,
+        distance=distance,
+        velocity=velocity,
+        response_=response,
+    )
+    assert result._repr_html_()  # this only run the code to check bugs
+
+
 # =============================================================================
 # calculate_distance with NAN 0 or -
 # =============================================================================

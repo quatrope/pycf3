@@ -58,7 +58,7 @@ def test_equatorial_calculate_velocity_dis_EQ_10(nam_no_cache, load_mresponse):
     assert result.calculator == pycf3.NAM.CALCULATOR
     assert result.url == pycf3.NAM.URL
     assert result.coordinate == pycf3.CoordinateSystem.equatorial
-    assert result.search_by == pycf3.Parameter.distance
+    assert result.calculated_by == pycf3.Parameter.distance
     assert result.distance == 10
     assert result.velocity is None
 
@@ -89,7 +89,7 @@ def test_equatorial_calculate_distance_vel_EQ_10(nam_no_cache, load_mresponse):
     assert result.calculator == pycf3.NAM.CALCULATOR
     assert result.url == pycf3.NAM.URL
     assert result.coordinate == pycf3.CoordinateSystem.equatorial
-    assert result.search_by == pycf3.Parameter.velocity
+    assert result.calculated_by == pycf3.Parameter.velocity
     assert result.distance is None
     assert result.velocity == 10
 
@@ -123,7 +123,7 @@ def test_galactic_calculate_velocity_dis_EQ_10(nam_no_cache, load_mresponse):
     assert result.calculator == pycf3.NAM.CALCULATOR
     assert result.url == pycf3.NAM.URL
     assert result.coordinate == pycf3.CoordinateSystem.galactic
-    assert result.search_by == pycf3.Parameter.distance
+    assert result.calculated_by == pycf3.Parameter.distance
     assert result.distance == 10
     assert result.velocity is None
 
@@ -154,7 +154,7 @@ def test_galactic_calculate_distance_vel_EQ_10(nam_no_cache, load_mresponse):
     assert result.calculator == pycf3.NAM.CALCULATOR
     assert result.url == pycf3.NAM.URL
     assert result.coordinate == pycf3.CoordinateSystem.galactic
-    assert result.search_by == pycf3.Parameter.velocity
+    assert result.calculated_by == pycf3.Parameter.velocity
     assert result.distance is None
     assert result.velocity == 10
 
@@ -188,7 +188,7 @@ def test_sgalactic_calculate_velocity_dis_EQ_10(nam_no_cache, load_mresponse):
     assert result.calculator == pycf3.NAM.CALCULATOR
     assert result.url == pycf3.NAM.URL
     assert result.coordinate == pycf3.CoordinateSystem.supergalactic
-    assert result.search_by == pycf3.Parameter.distance
+    assert result.calculated_by == pycf3.Parameter.distance
     assert result.distance == 10
     assert result.velocity is None
 
@@ -219,7 +219,7 @@ def test_sgalactic_calculate_distance_vel_EQ_10(nam_no_cache, load_mresponse):
     assert result.calculator == pycf3.NAM.CALCULATOR
     assert result.url == pycf3.NAM.URL
     assert result.coordinate == pycf3.CoordinateSystem.supergalactic
-    assert result.search_by == pycf3.Parameter.velocity
+    assert result.calculated_by == pycf3.Parameter.velocity
     assert result.distance is None
     assert result.velocity == 10
 

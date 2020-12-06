@@ -68,7 +68,10 @@ def test_integration_equatorial_search(cf3_temp_cache):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.equatorial
-    assert result.search_by == pycf3.Parameter.distance
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.distance
+
     assert result.distance == 10
     assert result.velocity is None
 
@@ -119,7 +122,10 @@ def test_integration_galactic_search(cf3_temp_cache):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.galactic
-    assert result.search_by == pycf3.Parameter.distance
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.distance
+
     assert result.distance == 10
     assert result.velocity is None
 
@@ -168,7 +174,10 @@ def test_integration_supergalactic_search(cf3_temp_cache):
     assert result.calculator == pycf3.CF3.CALCULATOR
     assert result.url == pycf3.CF3.URL
     assert result.coordinate == pycf3.CoordinateSystem.supergalactic
-    assert result.search_by == pycf3.Parameter.distance
+
+    with pytest.deprecated_call():
+        assert result.search_by == pycf3.Parameter.distance
+
     assert result.distance == 10
     assert result.velocity is None
 
