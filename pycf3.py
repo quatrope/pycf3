@@ -734,6 +734,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
     def calculate_distance(
         self,
         velocity,
+        *,
         ra=None,
         dec=None,
         glon=None,
@@ -805,6 +806,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
     def calculate_velocity(
         self,
         distance,
+        *,
         ra=None,
         dec=None,
         glon=None,
