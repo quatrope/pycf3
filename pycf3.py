@@ -26,13 +26,14 @@ For citation check:
 
 
 __all__ = [
-    "CFDeprecationWarning",
-    "MixedCoordinateSystemError",
+    "AbstractClient",
     "NAM",
     "CF3",
     "Result",
     "NoCache",
     "RetrySession",
+    "CFDeprecationWarning",
+    "MixedCoordinateSystemError",
 ]
 
 __version__ = "2020.11b"
@@ -209,11 +210,11 @@ RESULT_HTML_TEMPLATE = """
 
 
 class MixedCoordinateSystemError(ValueError):
-    """Raised when the parameters are 0from different coordinates systems."""
+    """Raised when the parameters are from different coordinates systems."""
 
 
 class CFDeprecationWarning(DeprecationWarning):
-    """Custom class to inform that some funcionality is in desuse."""
+    """Custom class to inform that some functionality is in desuse."""
 
 
 # =============================================================================
@@ -222,7 +223,7 @@ class CFDeprecationWarning(DeprecationWarning):
 
 
 class RetrySession(requests.Session):
-    """Session with retry.
+    r"""Session with retry.
 
     Parameters
     ----------
@@ -244,11 +245,9 @@ class RetrySession(requests.Session):
         longer than ``urllib3.Retry.BACKOFF_MAX``.
 
     status_forcelist: iterable (default: ``500, 502, 504``)
-
         A set of integer HTTP status codes that we should force a retry on. A
         retry is initiated if the request method is in method_whitelist and the
         response status code is in status_forcelist.
-
         By default, this is ``500, 502, 504``.
 
     """
@@ -371,6 +370,16 @@ class Result:
     response_ : ``requests.Response``
         Original response object create by the *requests* library.
         More information: https://2.python-requests.org
+    observed_distance_: ``numpy.ndarray``
+        Observed distances.
+    observed_velocity_: ``float``
+        Observed velocity
+    adjusted_distance_: ``numpy.ndarray``
+        Cosmologically adjusted distances.
+    adjusted_velocity_: ``float``
+        Cosmologically adjusted velocity, :math:`V^c_{ls}`.
+    search_at_: ``pycf3.SearchAt``
+        Coordinates in all the three supported systems.
 
     """
 
@@ -638,8 +647,6 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
                 f"{DELTA[coordinate_system]} must be >= -90 and <= 90"
             )
 
-        # ESTE FRAGMENTO DE CODIGO PUEDE SER ELIMINADO AL DEPRECAR EL API
-        # DESDE ===============================================================
         if (distance, velocity) == (None, None):
             raise ValueError(
                 "You must provide the distance or the velocity value"
@@ -648,7 +655,6 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
             raise ValueError(
                 "You cant provide velocity and distance at the same time"
             )
-        # HASTA ===============================================================
 
         if distance is not None:
             if not isinstance(distance, (int, float)):
@@ -745,12 +751,12 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
     ):
         """Calculate a distance based on the given velocity and location.
 
-        The mandatory parameters are ``velocity ' and a position
+        The mandatory parameters are ``velocity`` and a position
         expressed in two components depending on the chosen coordinate system:
 
-         - ``ra'' and ``dec'' for an equatorial system.
-         - ``glon'' and ``glat'' for a galactic system.
-         - ``sgl'' and ``sgb'' for a supergalactic system.
+         - ``ra`` and ``dec`` for an equatorial system.
+         - ``glon`` and ``glat`` for a galactic system.
+         - ``sgl`` and ``sgb`` for a supergalactic system.
 
         Coordinates cannot be mixed between systems, and must be expressed in
         J2000 as 360° decimal.
@@ -817,12 +823,12 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
     ):
         """Calculate a velocity based on the given distance and location.
 
-        The mandatory parameters are ``distance ' and a position
+        The mandatory parameters are ``distance`` and a position
         expressed in two components depending on the chosen coordinate system:
 
-         - ``ra'' and ``dec'' for an equatorial system.
-         - ``glon'' and ``glat'' for a galactic system.
-         - ``sgl'' and ``sgb'' for a supergalactic system.
+         - ``ra`` and ``dec`` for an equatorial system.
+         - ``glon`` and ``glat`` for a galactic system.
+         - ``sgl`` and ``sgb`` for a supergalactic system.
 
         Coordinates cannot be mixed between systems, and must be expressed in
         J2000 as 360° decimal.
