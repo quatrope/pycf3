@@ -475,8 +475,9 @@ class Result:
     @property
     @deprecated(
         category=CFDeprecationWarning,
-        action="default",
+        action="once",
         reason="Use `calculated_by` instead",
+        version="2020.12",
     )
     def search_by(self):
         """Proxy to ``response.calculated_by``."""
@@ -886,8 +887,9 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
     @deprecated(
         category=CFDeprecationWarning,
-        action="default",
-        reason="Use `calulate_velocity` or `calculate_distance` instead",
+        action="once",
+        reason="Use `calculate_velocity` or `calculate_distance` instead",
+        version="2020.12",
     )
     def equatorial_search(
         self,
@@ -900,6 +902,9 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         """Search by equatorial coordinates.
 
         The coordinates are expressed in J2000 as 360° decimal.
+
+        .. deprecated:: 2020.12
+            "Use `calculate_velocity` or `calculate_distance` instead"
 
         Parameters
         ----------
@@ -934,8 +939,9 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
     @deprecated(
         category=CFDeprecationWarning,
-        action="default",
-        reason="Use `calulate_velocity` or `calculate_distance` instead",
+        action="once",
+        reason="Use `calculate_velocity` or `calculate_distance` instead",
+        version="2020.12",
     )
     def galactic_search(
         self,
@@ -948,6 +954,9 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         """Search by galactic coordinates.
 
         The coordinates are expressed in J2000 as 360° decimal.
+
+        .. deprecated:: 2020.12
+            "Use `calculate_velocity` or `calculate_distance` instead"
 
         Parameters
         ----------
@@ -982,8 +991,9 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
 
     @deprecated(
         category=CFDeprecationWarning,
-        action="default",
-        reason="Use `calulate_velocity` or `calculate_distance` instead",
+        action="once",
+        reason="Use `calculate_velocity` or `calculate_distance` instead",
+        version="2020.12",
     )
     def supergalactic_search(
         self,
@@ -996,6 +1006,9 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         """Search super-galactic coordinates.
 
         The coordinates are expressed in J2000 as 360° decimal.
+
+        .. deprecated:: 2020.12
+            "Use `calculate_velocity` or `calculate_distance` instead"
 
         Parameters
         ----------
@@ -1058,7 +1071,10 @@ class NAM(AbstractClient):
     CALCULATOR = "NAM"
     URL = "http://edd.ifa.hawaii.edu/NAMcalculator/api.php"
 
+    #: Maximum distance to adjust the velocity.
     MAX_DISTANCE = 38
+
+    #: Maximum velocity to adjust the distance.
     MAX_VELOCITY = 2400
 
 
@@ -1093,5 +1109,8 @@ class CF3(AbstractClient):
     CALCULATOR = "CF3"
     URL = "http://edd.ifa.hawaii.edu/CF3calculator/api.php"
 
+    #: Maximum distance to adjust the velocity.
     MAX_DISTANCE = 200
+
+    #: Maximum velocity to adjust the distance.
     MAX_VELOCITY = 15_000
