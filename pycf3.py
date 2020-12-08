@@ -183,7 +183,9 @@ RESULT_HTML_TEMPLATE = """
             </tbody>
         </table>
         <div class="">
-            <a onclick="showRaw{{ id_result }}()" href="#">Show/Hide Raw</a>
+            <a onclick="return showRaw{{ id_result }}();" href="#">
+                Show/Hide Raw
+            </a>
             <div class="result-raw">
                 <code id="result-code-{{ id_result }}" class="hidden">
 {{ json_result }}
@@ -197,6 +199,7 @@ RESULT_HTML_TEMPLATE = """
                 var showed = document.getElementById(
                     "result-code-{{ id_result }}"
                 ).classList.toggle("hidden");
+                return false;
             }
         </script>
     </div>
@@ -341,7 +344,9 @@ class NoCache(MutableMapping):
 # RESPONSE OBJECT
 # =============================================================================
 
-SearchAt = namedtuple("SearchAt", ["ra", "dec", "glon", "glat", "sgl", "sgb"])
+CalculatedAt = namedtuple(
+    "CalculatedAt", ["ra", "dec", "glon", "glat", "sgl", "sgb"]
+)
 
 
 @attr.s(eq=False, order=False, frozen=True, repr=False)
@@ -378,7 +383,7 @@ class Result:
         Cosmologically adjusted distances.
     adjusted_velocity_: ``float``
         Cosmologically adjusted velocity, :math:`V^c_{ls}`.
-    search_at_: ``pycf3.SearchAt``
+    calculated_at_: ``pycf3.CalculatedAt``
         Coordinates in all the three supported systems.
 
     """
@@ -400,7 +405,7 @@ class Result:
     adjusted_distance_ = attr.ib(init=False, repr=False)
     adjusted_velocity_ = attr.ib(init=False, repr=False)
 
-    search_at_ = attr.ib(init=False, repr=False)
+    calculated_at_ = attr.ib(init=False, repr=False)
 
     # =========================================================================
     # INTERNAL
@@ -473,17 +478,6 @@ class Result:
         return jinja2.Template(RESULT_HTML_TEMPLATE).render(**params)
 
     @property
-    @deprecated(
-        category=CFDeprecationWarning,
-        action="once",
-        reason="Use `calculated_by` instead",
-        version="2020.12",
-    )
-    def search_by(self):
-        """Proxy to ``response.calculated_by``."""
-        return self.calculated_by
-
-    @property
     def json_(self):
         """Proxy to ``response_.json()``."""
         return self.response_.json()
@@ -514,10 +508,10 @@ class Result:
         except KeyError:
             return None
 
-    @search_at_.default
-    def _search_at_default(self):
+    @calculated_at_.default
+    def _calculated_at_default(self):
         data = self.json_
-        return SearchAt(
+        return CalculatedAt(
             ra=data["RA"],
             dec=data["Dec"],
             glon=data["Glon"],
@@ -525,6 +519,42 @@ class Result:
             sgl=data["SGL"],
             sgb=data["SGB"],
         )
+
+    # =========================================================================
+    # DEPRECATED API
+    # =========================================================================
+
+    @property
+    @deprecated(
+        category=CFDeprecationWarning,
+        action="once",
+        reason="Use `calculated_by` instead",
+        version="2020.12",
+    )
+    def search_by(self):
+        """Proxy to ``response.calculated_by``.
+
+        .. deprecated:: 2020.12
+            "Use `calculated_by` instead"
+
+        """
+        return self.calculated_by
+
+    @property
+    @deprecated(
+        category=CFDeprecationWarning,
+        action="once",
+        reason="Use `calculated_at_` instead",
+        version="2020.12",
+    )
+    def search_at_(self):
+        """Proxy to ``response.calculated_at_``.
+
+        .. deprecated:: 2020.12
+            "Use `calculated_at` instead"
+
+        """
+        return self.calculated_at_
 
 
 # =============================================================================
