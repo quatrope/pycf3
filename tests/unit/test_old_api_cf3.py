@@ -74,12 +74,23 @@ def test_equatorial_search_distance_10(cf3_no_cache, load_mresponse):
     npt.assert_almost_equal(result.alpha, 187.78917, decimal=4)
     npt.assert_almost_equal(result.delta, 13.33386, decimal=4)
 
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
 
 def test_equatorial_search_velocity_10(cf3_no_cache, load_mresponse):
@@ -111,12 +122,23 @@ def test_equatorial_search_velocity_10(cf3_no_cache, load_mresponse):
     npt.assert_almost_equal(result.alpha, 187.78917, decimal=4)
     npt.assert_almost_equal(result.delta, 13.33386, decimal=4)
 
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
 
 def test_equatorial_search_ra_not_number(cf3_no_cache):
@@ -197,12 +219,23 @@ def test_galactic_search_distance_10(cf3_no_cache, load_mresponse):
     npt.assert_almost_equal(result.alpha, 282.96547, decimal=4)
     npt.assert_almost_equal(result.delta, 75.41360, decimal=4)
 
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
 
 def test_galactic_search_velocity_10(cf3_no_cache, load_mresponse):
@@ -234,12 +267,23 @@ def test_galactic_search_velocity_10(cf3_no_cache, load_mresponse):
     npt.assert_almost_equal(result.alpha, 282.96547, decimal=4)
     npt.assert_almost_equal(result.delta, 75.41360, decimal=4)
 
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
 
 def test_galactic_search_glon_not_number(cf3_no_cache):
@@ -320,12 +364,23 @@ def test_supergalactic_search_distance_10(cf3_no_cache, load_mresponse):
     npt.assert_almost_equal(result.alpha, 102, decimal=4)
     npt.assert_almost_equal(result.delta, -2, decimal=4)
 
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
 
 def test_supergalactic_search_velocity_10(cf3_no_cache, load_mresponse):
@@ -357,12 +412,23 @@ def test_supergalactic_search_velocity_10(cf3_no_cache, load_mresponse):
     npt.assert_almost_equal(result.alpha, 102, decimal=4)
     npt.assert_almost_equal(result.delta, -2, decimal=4)
 
-    npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
-    npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
-    npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
-    npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.ra, 187.78917, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.dec, 13.33386, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glon, 282.96547, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.glat, 75.41360, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgl, 102.00000, decimal=4)
+
+    with pytest.deprecated_call():
+        npt.assert_almost_equal(result.search_at_.sgb, -2.00000, decimal=4)
 
 
 def test_supergalactic_search_sgl_not_number(cf3_no_cache):

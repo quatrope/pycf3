@@ -348,6 +348,53 @@ def test_calculate_velocity_delta_lt_m90(params, fakeclient_no_cache):
 
 
 # =============================================================================
+#
+# =============================================================================
+
+
+@pytest.mark.parametrize(
+    "alpha_delta",
+    [
+        ("ra", "dec"),
+        ("glon", "glat"),
+        ("sgl", "sgb"),
+    ],
+)
+def test_calculate_velocity_missing_alpha_delta_companion(
+    alpha_delta, fakeclient_no_cache
+):
+    client = fakeclient_no_cache
+    alpha, delta = alpha_delta
+    with pytest.raises(ValueError, match=f"No {delta} provided"):
+        params = {alpha: 1}
+        client.calculate_velocity(distance=10, **params)
+    with pytest.raises(ValueError, match=f"No {alpha} provided"):
+        params = {delta: 1}
+        client.calculate_velocity(distance=10, **params)
+
+
+@pytest.mark.parametrize(
+    "alpha_delta",
+    [
+        ("ra", "dec"),
+        ("glon", "glat"),
+        ("sgl", "sgb"),
+    ],
+)
+def test_calculate_distance_missing_alpha_delta_companion(
+    alpha_delta, fakeclient_no_cache
+):
+    client = fakeclient_no_cache
+    alpha, delta = alpha_delta
+    with pytest.raises(ValueError, match=f"No {delta} provided"):
+        params = {alpha: 1}
+        client.calculate_distance(velocity=10, **params)
+    with pytest.raises(ValueError, match=f"No {alpha} provided"):
+        params = {delta: 1}
+        client.calculate_distance(velocity=10, **params)
+
+
+# =============================================================================
 # MIX COORDINATES
 # =============================================================================
 

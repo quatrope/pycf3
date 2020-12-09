@@ -207,9 +207,9 @@ RESULT_HTML_TEMPLATE = """
 """
 
 
-# ===============================================================================
+# =============================================================================
 # EXCEPTIONS
-# ===============================================================================
+# =============================================================================
 
 
 class MixedCoordinateSystemError(ValueError):
@@ -618,7 +618,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
         # if we only have one we need to check wich one and inform about
         # the mising companinon
         if len(params) == 1:
-            pname = params.keys()[0]
+            pname = list(params.keys())[0]
             coordinate_system, companion_dict = (
                 (ALPHA_TO_COORDINATE[pname], DELTA)
                 if pname in ALPHA_TO_COORDINATE
