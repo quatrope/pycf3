@@ -90,6 +90,7 @@ Quick Usage
 .. code-block:: pycon
 
    >>> import pycf3
+   >>> cf3 = pycf3.CF3()
    >>> result = cf3.calculate_distance(velocity=9000, glon=283, glat=75)
    >>> print(result.observed_velocity_)
    9000.0
@@ -102,9 +103,12 @@ documentation <https://pycf3.readthedocs.io>`_.
 Citation
 --------
 
-Please acknowledge pycf3 in any research report or publication that
-requires citation of any author\'s work. Our suggested acknowledgment
-is:
+
+* If you use the results of this work in your research or other applications, 
+  please cite `Kourkchi et al. 2020, AJ, 159, 67 <https://ui.adsabs.harvard.edu/abs/2020AJ....159...67K/abstract>`_
+* Please acknowledge pycf3 in any research report or publication that
+  requires citation of any author\'s work. Our suggested acknowledgment
+  is:
 
 ..
 
