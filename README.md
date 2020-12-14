@@ -71,7 +71,7 @@ documentation](https://pycf3.readthedocs.io).
 ## Citation
 
 - If you use the results of this work in your research or other applications, 
-please cite [Kourkchi et al. 2020, AJ, 159, 67](https://ui.adsabs.harvard.edu/abs/2020AJ....159...67K/abstract)
+please cite [Kourkchi et al. 2020, AJ, 159, 67](https://ui.adsabs.harvard.edu/abs/2020AJ....159...67K/abstract){:target="_blank" rel="noopener"}
 - Please acknowledge pycf3 in any research report or publication that
 requires citation of any author\'s work. Our suggested acknowledgment
 is:
