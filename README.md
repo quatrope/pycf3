@@ -1,6 +1,6 @@
 # pycf3 - Cosmicflows Galaxy Distance-Velocity Calculator client for Python
 
-![image](https://raw.githubusercontent.com/quatrope/pycf3/master/res/logo.png)
+![image](https://raw.githubusercontent.com/quatrope/pycf3/master/res/logo_wbg.png)
 
 ----
 
