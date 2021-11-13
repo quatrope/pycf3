@@ -122,7 +122,9 @@ Please cite:
 
 ## Short video description
 
-[![Watch the video](https://youtu.be/yd3IaIsM4Bg)](https://youtu.be/yd3IaIsM4Bg)
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/yd3IaIsM4Bg/0.jpg)](https://www.youtube.com/watch?v=yd3IaIsM4Bg)
+
 
 
 
