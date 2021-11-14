@@ -26,6 +26,7 @@ jobs:
           - docstyle
           - check-manifest
           - coverage
+          - integration
           - make-docs
 
         # check version by version
