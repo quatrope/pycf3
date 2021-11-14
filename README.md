@@ -6,7 +6,6 @@
 
 [![QuatroPe](https://img.shields.io/badge/QuatroPe-Applications-1c5896)](https://quatrope.github.io/)
 [![PyCF3 CI](https://github.com/quatrope/pycf3/actions/workflows/CI.yml/badge.svg)](https://github.com/quatrope/pycf3/actions/workflows/CI.yml)
-[![Travis-CI](https://travis-ci.com/quatrope/pycf3.svg?branch=master)](https://travis-ci.com/quatrope/pycf3)
 [![ReadTheDocs.org](https://readthedocs.org/projects/pycf3/badge/?version=latest)](https://pycf3.readthedocs.io/en/latest/?badge=latest)
 [![License](https://img.shields.io/badge/License-BSD3-blue.svg)](https://www.tldrlegal.com/l/bsd3)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://badge.fury.io/py/pycf3)
