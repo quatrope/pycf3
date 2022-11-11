@@ -89,7 +89,7 @@ master_doc = 'index'
 # PREPROCESS RST
 # =============================================================================
 
-import m2r
+import m2r2
 
 with open(PROJECT_PATH / "README.md") as fp:
     md = fp.read()
@@ -97,7 +97,7 @@ with open(PROJECT_PATH / "README.md") as fp:
 
 index = f"""
 
-{m2r.convert(md)}
+{m2r2.convert(md)}
 
 Contents:
 ---------

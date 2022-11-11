@@ -3,7 +3,7 @@ ipython
 Sphinx>=4.2.0
 sphinx-rtd-theme
 nbsphinx
-m2r
+m2r2
 
 
 

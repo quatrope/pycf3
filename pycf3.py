@@ -36,7 +36,7 @@ __all__ = [
     "MixedCoordinateSystemError",
 ]
 
-__version__ = "2020.12"
+__version__ = "2022.11"
 
 
 # =============================================================================
@@ -719,7 +719,7 @@ class AbstractClient(metaclass=DocInheritMeta(style="numpy")):
             coordinate_system.value,
         )
         key = dcache.core.args_to_key(
-            base=base, args=(self.URL,), kwargs=payload, typed=False
+            base=base, args=(self.URL,), kwargs=payload, typed=False, ignore=[]
         )
 
         with self.cache as cache:
